@@ -9,64 +9,64 @@ DROP TABLE IF EXISTS schedule_update CASCADE;
 DROP TABLE IF EXISTS journey_disruption CASCADE;
 
 CREATE TABLE area (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   name TEXT,
   update TIMESTAMP
 );
 CREATE TABLE route(
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   type DECIMAL,
   line TEXT,
   update TIMESTAMP
 );
 CREATE TABLE stop (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   name TEXT,
-  area INTEGER,
+  area UUID,
   update TIMESTAMP
 );
 CREATE TABLE journey (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   headsign TEXT,
-  route INTEGER,
+  route UUID,
   update TIMESTAMP
 );
 CREATE TABLE calendar_date (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   days JSON,
   valid_from DATE,
   valid_until DATE,
-  journey INTEGER,
+  journey UUID,
   update TIMESTAMP
 );
 CREATE TABLE calendar_exception (
   id SERIAL PRIMARY KEY,
   date DATE,
   type DECIMAL,
-  calendar_date INTEGER,
+  calendar_date UUID,
   update TIMESTAMP
 );
 CREATE TABLE schedule (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   platform TEXT,
   planned_arrival TIME,
   planned_departure TIME,
-  stop INTEGER,
-  journey INTEGER,
+  stop UUID,
+  journey UUID,
   update TIMESTAMP
 );
 CREATE TABLE schedule_update (
-  id SERIAL PRIMARY KEY,
-  schedule INTEGER,
+  id UUID PRIMARY KEY,
+  schedule UUID,
   actual_arrival TIME,
   actual_departure TIME
 );
 CREATE TABLE journey_disruption (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   message TEXT,
   start TIMESTAMP,
   planned_end TIMESTAMP,
-  journey INTEGER
+  journey UUID
 );
 ALTER TABLE stop ADD FOREIGN KEY(area) REFERENCES area;
 ALTER TABLE journey ADD FOREIGN KEY(route) REFERENCES route;
