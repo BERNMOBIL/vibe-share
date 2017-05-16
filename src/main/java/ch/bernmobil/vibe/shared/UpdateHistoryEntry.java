@@ -2,17 +2,17 @@ package ch.bernmobil.vibe.shared;
 
 import java.sql.Timestamp;
 
-public class UpdateHistory {
+public class UpdateHistoryEntry {
     private int id;
     private Timestamp time;
-    private String status;
+    private UpdateManager.Status status;
 
-    public UpdateHistory(int id, Timestamp time, String status) {
+    public UpdateHistoryEntry(int id, Timestamp time, UpdateManager.Status status) {
         this.id = id;
         this.time = time;
         this.status = status;
     }
-    public UpdateHistory(Timestamp time, String status) {
+    public UpdateHistoryEntry(Timestamp time, UpdateManager.Status status) {
         this.time = time;
         this.status = status;
     }
@@ -33,11 +33,11 @@ public class UpdateHistory {
         this.time = time;
     }
 
-    public String getStatus() {
+    public UpdateManager.Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(UpdateManager.Status status) {
         this.status = status;
     }
 }
