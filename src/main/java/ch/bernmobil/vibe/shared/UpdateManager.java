@@ -15,8 +15,8 @@ import static java.util.stream.Collectors.toList;
 @Component
 public class UpdateManager {
 
-    private final JdbcTemplate jdbcMapperTemplate;
-    private final JdbcTemplate jdbcVibeTemplate;
+    private final UpdateManagerRepository mapperRepository;
+    private final UpdateManagerRepository staticRepository;
 
     private static final String[] TABLES_TO_DELETE = {ScheduleContract.TABLE_NAME,
             CalendarDateContract.TABLE_NAME,
@@ -42,13 +42,13 @@ public class UpdateManager {
     //TODO
     public enum Status {IN_PROGRESS, SUCCESS, FAILED}
 
-    public UpdateManager(DataSource mapperDataSource,
-                         DataSource postgresDataSource,
+    public UpdateManager(UpdateManagerRepository mapperRepository,
+                         UpdateManagerRepository staticRepository,
                          UpdateHistoryRepository updateHistoryRepository,
                          int updateHistoryLength,
                          Duration updateTimeout) {
-        jdbcMapperTemplate = new JdbcTemplate(mapperDataSource);
-        jdbcVibeTemplate = new JdbcTemplate(postgresDataSource);
+        this.mapperRepository = mapperRepository;
+        this.staticRepository = staticRepository;
         this.updateHistoryRepository = updateHistoryRepository;
         this.updateHistoryLength = updateHistoryLength;
         this.updateTimeoutMilliseconds = updateTimeout.toMillis();
@@ -63,49 +63,19 @@ public class UpdateManager {
     public void cleanOldData() {
         List<UpdateHistoryEntry> latestUpdates = updateHistoryRepository.findLatestNUpdates(updateHistoryLength);
         List<Timestamp> latestUpdatesTimestamps = latestUpdates.stream().map(UpdateHistoryEntry::getTime).collect(toList());
-        jdbcVibeTemplate.update(new QueryBuilder().truncate(ScheduleUpdateContract.TABLE_NAME).getQuery());
-        deleteUpdatesWithInvalidTimestamp(TABLES_TO_DELETE, latestUpdatesTimestamps, jdbcVibeTemplate);
-        deleteUpdatesWithInvalidTimestamp(MAPPING_TABLES_TO_DELETE, latestUpdatesTimestamps, jdbcMapperTemplate);
+        staticRepository.truncate(ScheduleUpdateContract.TABLE_NAME);
+        staticRepository.deleteUpdatesWithInvalidTimestamp(TABLES_TO_DELETE, latestUpdatesTimestamps);
+        mapperRepository.deleteUpdatesWithInvalidTimestamp(MAPPING_TABLES_TO_DELETE, latestUpdatesTimestamps);
     }
 
     public void repairFailedUpdate() {
         Timestamp failedUpdateTimestamp = UpdateManager.activeUpdateTimestamp;
-        deleteByUpdateTimestamp(UpdateHistoryContract.TABLE_NAME, failedUpdateTimestamp, jdbcVibeTemplate, UpdateHistoryContract.TIME);
-        deleteByUpdateTimestamp(TABLES_TO_DELETE, failedUpdateTimestamp, jdbcVibeTemplate);
-        deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, failedUpdateTimestamp, jdbcMapperTemplate);
+        //TODO: discuss if history should contain failed update entries
+        staticRepository.deleteByUpdateTimestamp(UpdateHistoryContract.TABLE_NAME, failedUpdateTimestamp, UpdateHistoryContract.TIME);
+        staticRepository.deleteByUpdateTimestamp(TABLES_TO_DELETE, failedUpdateTimestamp);
+        mapperRepository.deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, failedUpdateTimestamp);
     }
 
-    private void deleteUpdatesWithInvalidTimestamp(String table, List<Timestamp> lastUpdates, JdbcTemplate jdbcTemplate) {
-        ArrayList<QueryBuilder.Predicate> predicates = new ArrayList<>();
-        for (Timestamp timestamp : lastUpdates) {
-            predicates.add(QueryBuilder.Predicate.notEquals("update", String.format("'%s'", timestamp)));
-        }
-        QueryBuilder.Predicate predicate = QueryBuilder.Predicate.joinAnd(predicates);
-        jdbcTemplate.update(new QueryBuilder()
-                        .delete(table)
-                        .where(predicate)
-                        .getQuery());
-    }
-
-    private void deleteUpdatesWithInvalidTimestamp(String[] tables, List<Timestamp> lastUpdates, JdbcTemplate jdbcTemplate) {
-        for (String table : tables) {
-            deleteUpdatesWithInvalidTimestamp(table, lastUpdates, jdbcTemplate);
-        }
-    }
-
-    private void deleteByUpdateTimestamp(String table, Timestamp updateTimestamp,
-        JdbcTemplate jdbcTemplate, String timestampColumn) {
-        jdbcTemplate.update(new QueryBuilder()
-                        .delete(table)
-                        .where(QueryBuilder.Predicate.equals(timestampColumn, String.format("'%s'", updateTimestamp)))
-                        .getQuery());
-    }
-
-    private void deleteByUpdateTimestamp(String[] tables, Timestamp updateTimestamp, JdbcTemplate jdbcTemplate) {
-        for (String table : tables) {
-            deleteByUpdateTimestamp(table, updateTimestamp, jdbcTemplate, "update");
-        }
-    }
 
     public boolean hasUpdateCollision() {
         UpdateHistoryEntry lastUpdate = updateHistoryRepository.findLastUpdate();
@@ -115,8 +85,8 @@ public class UpdateManager {
             if(timeDiff > updateTimeoutMilliseconds) {
                 lastUpdate.setStatus(Status.FAILED);
                 updateHistoryRepository.update(lastUpdate);
-                deleteByUpdateTimestamp(TABLES_TO_DELETE, lastUpdate.getTime(), jdbcVibeTemplate);
-                deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, lastUpdate.getTime(), jdbcMapperTemplate);
+                staticRepository.deleteByUpdateTimestamp(TABLES_TO_DELETE, lastUpdate.getTime());
+                mapperRepository.deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, lastUpdate.getTime());
                 return false;
             }
             return true;
