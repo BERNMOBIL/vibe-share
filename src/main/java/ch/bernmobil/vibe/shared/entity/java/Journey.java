@@ -1,21 +1,27 @@
 package ch.bernmobil.vibe.shared.entity.java;
 
-public class Journey {
-    private long id;
-    private String headsign;
-    private long route;
+import java.util.UUID;
 
-    public Journey(long id, String headsign, long route) {
+public class Journey {
+    private UUID id;
+    private String headsign;
+    private UUID route;
+
+
+    private UUID terminalStation;
+
+    public Journey(UUID id, String headsign, UUID route, UUID terminalStation) {
         this.id = id;
         this.headsign = headsign;
         this.route = route;
+        this.terminalStation = terminalStation;
     }
 
-    public long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -27,11 +33,19 @@ public class Journey {
         this.headsign = headsign;
     }
 
-    public long getRoute() {
+    public UUID getRoute() {
         return route;
     }
 
-    public void setRoute(long route) {
+    public void setRoute(UUID route) {
         this.route = route;
+    }
+
+    public UUID getTerminalStation() {
+        return terminalStation;
+    }
+
+    public void setTerminalStation(UUID terminalStation) {
+        this.terminalStation = terminalStation;
     }
 }
