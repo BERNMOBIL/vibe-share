@@ -1,4 +1,5 @@
 package ch.bernmobil.vibe.shared.entity.java;
+import java.util.UUID;
 
 import java.util.UUID;
 
@@ -37,3 +38,4 @@ public class Stop {
         this.area = area;
     }
 }
+
