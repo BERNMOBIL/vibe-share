@@ -26,10 +26,7 @@ public class UpdateManager {
     public enum Status {IN_PROGRESS, SUCCESS, FAILED}
 
     @Autowired
-    public UpdateManager(
-        @Qualifier("MapperDataSource") DataSource mapperDataSource,
-        @Qualifier("StaticDataSource") DataSource postgresDataSource,
-        UpdateHistoryRepository updateHistoryRepository) {
+    public UpdateManager(DataSource mapperDataSource, DataSource postgresDataSource, UpdateHistoryRepository updateHistoryRepository) {
         jdbcMapperTemplate = new JdbcTemplate(mapperDataSource);
         jdbcVibeTemplate = new JdbcTemplate(postgresDataSource);
         this.updateHistoryRepository = updateHistoryRepository;

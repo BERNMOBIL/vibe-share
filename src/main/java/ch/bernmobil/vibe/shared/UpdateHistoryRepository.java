@@ -19,7 +19,7 @@ public class UpdateHistoryRepository {
     private final JdbcTemplate jdbcTemplate;
     private final String TABLE = "update_history";
 
-    public UpdateHistoryRepository(@Qualifier("StaticDataSource")DataSource dataSource) {
+    public UpdateHistoryRepository(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
