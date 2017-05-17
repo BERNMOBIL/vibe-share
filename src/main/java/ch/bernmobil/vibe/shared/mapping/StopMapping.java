@@ -13,6 +13,10 @@ public class StopMapping {
         this.id = id;
     }
 
+    public StopMapping(String gtfsId, UUID id) {
+        this(gtfsId, null, id);
+    }
+
     public String getGtfsId() {
         return gtfsId;
     }
