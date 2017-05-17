@@ -76,7 +76,7 @@ public class UpdateHistoryRepository {
     }
 
     public void update(UpdateHistoryEntry element) {
-        jdbcTemplate.update("UPDATE update_history SET status = ?, timestamp = ? WHERE id = ?",
+        jdbcTemplate.update("UPDATE update_history SET status = ?, time = ? WHERE id = ?",
                 new Object[]{element.getStatus(), element.getTime(), element.getId()},
                 new int[]{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER});
     }
