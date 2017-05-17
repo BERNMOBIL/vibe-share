@@ -93,4 +93,10 @@ public class UpdateManager {
         }
         return false;
     }
+
+    public void setStatus(Status status) {
+        UpdateHistoryEntry element = updateHistoryRepository.findByTimestamp(activeUpdateTimestamp);
+        element.setStatus(status);
+        updateHistoryRepository.update(element);
+    }
 }

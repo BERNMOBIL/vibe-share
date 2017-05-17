@@ -25,6 +25,13 @@ public class UpdateHistoryRepository {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    public UpdateHistoryEntry findByTimestamp(Timestamp timestamp) {
+        return queryForObject(new QueryBuilder()
+                .select(UpdateHistoryContract.TABLE_NAME)
+                .where(Predicate.equals(UpdateHistoryContract.TIME, String.format("'%s'", timestamp)))
+                .getQuery());
+    }
+
     public UpdateHistoryEntry findLastSuccessUpdate() {
         Predicate successStatus = Predicate.equals(UpdateHistoryContract.STATUS, "'" + Status.SUCCESS + "'");
         String query = new QueryBuilder()
@@ -33,7 +40,6 @@ public class UpdateHistoryRepository {
                 .orderby(UpdateHistoryContract.TIME + " DESC")
                 .limit("1")
                 .getQuery();
-
         return queryForObject(query);
     }
 
@@ -73,7 +79,6 @@ public class UpdateHistoryRepository {
         jdbcTemplate.update("UPDATE update_history SET status = ?, timestamp = ? WHERE id = ?",
                 new Object[]{element.getStatus(), element.getTime(), element.getId()},
                 new int[]{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER});
-
     }
 
     //TODO: document
