@@ -72,8 +72,7 @@ CREATE TABLE journey_disruption (
 );
 
 CREATE TABLE update_history (
-  id SERIAL PRIMARY KEY,
-  time TIMESTAMP,
+  time TIMESTAMP PRIMARY KEY,
   status TEXT
 );
 
