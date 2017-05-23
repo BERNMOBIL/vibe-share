@@ -1,7 +1,6 @@
 package ch.bernmobil.vibe.shared;
 
 import ch.bernmobil.vibe.shared.contract.UpdateHistoryContract;
-import java.sql.Connection;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,7 +17,6 @@ import java.util.List;
 import static ch.bernmobil.vibe.shared.QueryBuilder.Predicate;
 import static ch.bernmobil.vibe.shared.QueryBuilder.PreparedStatement;
 import static ch.bernmobil.vibe.shared.UpdateManager.Status;
-import static java.sql.Connection.TRANSACTION_SERIALIZABLE;
 
 @Repository
 public class UpdateHistoryRepository {
