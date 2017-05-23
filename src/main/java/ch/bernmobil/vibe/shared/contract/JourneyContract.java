@@ -5,6 +5,9 @@ public final class JourneyContract {
     public final static String ID = "id";
     public final static String HEADSIGN = "headsign";
     public final static String ROUTE = "route";
+    public final static String TERMINAL_STATION = "terminal_station";
     public final static String UPDATE = "update";
+
+    public final static String[] COLUMNS = {ID, HEADSIGN, ROUTE, TERMINAL_STATION, UPDATE};
 
 }

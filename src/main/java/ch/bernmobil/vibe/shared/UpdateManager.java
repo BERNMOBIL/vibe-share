@@ -1,6 +1,7 @@
 package ch.bernmobil.vibe.shared;
 
 import ch.bernmobil.vibe.shared.contract.*;
+import java.sql.SQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +40,7 @@ public class UpdateManager {
 
     //TODO: singleton object
     private static Timestamp activeUpdateTimestamp;
+
     //TODO
     public enum Status {IN_PROGRESS, SUCCESS, FAILED}
 
@@ -54,10 +56,15 @@ public class UpdateManager {
         this.updateTimeoutMilliseconds = updateTimeout.toMillis();
     }
 
-    public void startUpdate() {
-        activeUpdateTimestamp = new Timestamp(System.currentTimeMillis());
-        UpdateHistoryEntry newEntry = new UpdateHistoryEntry(activeUpdateTimestamp, Status.IN_PROGRESS);
+
+    public Timestamp prepareUpdate() {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        UpdateHistoryEntry newEntry = new UpdateHistoryEntry(now, Status.IN_PROGRESS);
         updateHistoryRepository.insert(newEntry);
+        return now;
+    }
+    public void startUpdate(Timestamp timestamp) {
+        activeUpdateTimestamp = timestamp;
     }
 
     public void cleanOldData() {
@@ -69,13 +76,12 @@ public class UpdateManager {
     }
 
     public void repairFailedUpdate() {
-        Timestamp failedUpdateTimestamp = UpdateManager.activeUpdateTimestamp;
-        //TODO: discuss if history should contain failed update entries
-        staticRepository.deleteByUpdateTimestamp(UpdateHistoryContract.TABLE_NAME, failedUpdateTimestamp, UpdateHistoryContract.TIME);
-        staticRepository.deleteByUpdateTimestamp(TABLES_TO_DELETE, failedUpdateTimestamp);
-        mapperRepository.deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, failedUpdateTimestamp);
+        if(UpdateManager.activeUpdateTimestamp != null) {
+            Timestamp failedUpdateTimestamp = UpdateManager.activeUpdateTimestamp;
+            staticRepository.deleteByUpdateTimestamp(TABLES_TO_DELETE, failedUpdateTimestamp);
+            mapperRepository.deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, failedUpdateTimestamp);
+        }
     }
-
 
     public boolean hasUpdateCollision() {
         UpdateHistoryEntry lastUpdate = updateHistoryRepository.findLastUpdate();
@@ -98,5 +104,17 @@ public class UpdateManager {
         UpdateHistoryEntry element = updateHistoryRepository.findByTimestamp(activeUpdateTimestamp);
         element.setStatus(status);
         updateHistoryRepository.update(element);
+    }
+
+    public void removeUpdateByTimestamp(Timestamp timestamp) {
+        staticRepository.deleteByUpdateTimestamp(UpdateHistoryContract.TABLE_NAME, timestamp, UpdateHistoryContract.TIME);
+    }
+
+    public int getRowCount() {
+        return updateHistoryRepository.count();
+    }
+
+    public static Timestamp getActiveUpdateTimestamp() {
+        return activeUpdateTimestamp;
     }
 }

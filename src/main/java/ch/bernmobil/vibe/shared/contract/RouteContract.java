@@ -6,4 +6,6 @@ public final class RouteContract {
     public final static String TYPE = "type";
     public final static String LINE = "line";
     public final static String UPDATE = "update";
+
+    public final static String[] COLUMNS = {ID, TYPE, LINE, UPDATE};
 }

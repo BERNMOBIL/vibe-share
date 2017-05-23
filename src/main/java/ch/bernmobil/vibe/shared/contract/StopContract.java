@@ -6,4 +6,6 @@ public final class StopContract {
     public final static String NAME = "name";
     public final static String AREA = "area";
     public final static String UPDATE = "update";
+
+    public final static String[] COLUMNS = {ID, NAME, AREA, UPDATE};
 }

@@ -1,5 +1,7 @@
 package ch.bernmobil.vibe.shared;
 
+import ch.bernmobil.vibe.shared.contract.UpdateHistoryContract;
+import java.sql.Connection;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +18,7 @@ import java.util.List;
 import static ch.bernmobil.vibe.shared.QueryBuilder.Predicate;
 import static ch.bernmobil.vibe.shared.QueryBuilder.PreparedStatement;
 import static ch.bernmobil.vibe.shared.UpdateManager.Status;
+import static java.sql.Connection.TRANSACTION_SERIALIZABLE;
 
 @Repository
 public class UpdateHistoryRepository {
@@ -76,9 +79,9 @@ public class UpdateHistoryRepository {
     }
 
     public void update(UpdateHistoryEntry element) {
-        jdbcTemplate.update("UPDATE update_history SET status = ?, time = ? WHERE id = ?",
-                new Object[]{element.getStatus(), element.getTime(), element.getId()},
-                new int[]{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER});
+        jdbcTemplate.update("UPDATE update_history SET status = ? WHERE time = ?",
+                new Object[]{element.getStatus(), element.getTime()},
+                new int[]{Types.VARCHAR, Types.TIMESTAMP});
     }
 
     //TODO: document
@@ -90,12 +93,18 @@ public class UpdateHistoryRepository {
         }
     }
 
+    public int count() {
+        return jdbcTemplate.queryForObject(new QueryBuilder()
+                .select("count(*)", UpdateHistoryContract.TABLE_NAME)
+                .getQuery(), Integer.class);
+    }
+
     private class UpdateRowMapper implements RowMapper<UpdateHistoryEntry> {
+        @Override
         public UpdateHistoryEntry mapRow(ResultSet rs, int rowNum) throws SQLException {
-            int id = rs.getInt(UpdateHistoryContract.ID);
             Timestamp time = rs.getTimestamp(UpdateHistoryContract.TIME);
             Status status = Status.valueOf(rs.getString(UpdateHistoryContract.STATUS));
-            return new UpdateHistoryEntry(id, time, status);
+            return new UpdateHistoryEntry(time, status);
         }
     }
 }
