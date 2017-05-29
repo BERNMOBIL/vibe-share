@@ -42,7 +42,7 @@ CREATE TABLE calendar_date (
   update TIMESTAMP
 );
 CREATE TABLE calendar_exception (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   date DATE,
   type DECIMAL,
   calendar_date UUID,
