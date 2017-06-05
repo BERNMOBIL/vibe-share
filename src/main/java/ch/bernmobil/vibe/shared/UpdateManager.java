@@ -38,7 +38,6 @@ public class UpdateManager {
 
     private final UpdateHistoryRepository updateHistoryRepository;
 
-    //TODO: singleton object
     private static Timestamp activeUpdateTimestamp;
 
     //TODO
@@ -63,7 +62,7 @@ public class UpdateManager {
         updateHistoryRepository.insert(newEntry);
         return now;
     }
-    public void startUpdate(Timestamp timestamp) {
+    public static void startUpdate(Timestamp timestamp) {
         activeUpdateTimestamp = timestamp;
     }
 

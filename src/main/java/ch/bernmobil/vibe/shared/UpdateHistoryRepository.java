@@ -20,6 +20,7 @@ import static ch.bernmobil.vibe.shared.UpdateManager.Status;
 
 @Repository
 public class UpdateHistoryRepository {
+    public static final String DESC = " DESC";
     private final JdbcTemplate jdbcTemplate;
 
     public UpdateHistoryRepository(@Qualifier("StaticDataSource") DataSource dataSource) {
@@ -38,7 +39,7 @@ public class UpdateHistoryRepository {
         String query = new QueryBuilder()
                 .select(UpdateHistoryContract.TABLE_NAME)
                 .where(successStatus)
-                .orderby(UpdateHistoryContract.TIME + " DESC")
+                .orderby(UpdateHistoryContract.TIME + DESC)
                 .limit("1")
                 .getQuery();
         return queryForObject(query);
@@ -47,7 +48,7 @@ public class UpdateHistoryRepository {
     public UpdateHistoryEntry findLastUpdate() {
         String query = new QueryBuilder()
                 .select(UpdateHistoryContract.TABLE_NAME)
-                .orderby(UpdateHistoryContract.TIME + " DESC")
+                .orderby(UpdateHistoryContract.TIME + DESC)
                 .limit("1")
                 .getQuery();
 
@@ -57,7 +58,7 @@ public class UpdateHistoryRepository {
     public List<UpdateHistoryEntry> findLatestNUpdates(int num) {
         String query = new QueryBuilder()
                 .select(UpdateHistoryContract.TABLE_NAME)
-                .orderby(UpdateHistoryContract.TIME + " DESC")
+                .orderby(UpdateHistoryContract.TIME + DESC)
                 .limit(String.format("%d", num))
                 .getQuery();
 
