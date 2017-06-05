@@ -27,5 +27,6 @@ repositories {
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile group: 'com.google.code.gson', name: 'gson', version: '1.7.2'
+    compile('org.jooq:jooq:3.9.1')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

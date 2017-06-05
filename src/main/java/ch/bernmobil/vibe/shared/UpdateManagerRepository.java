@@ -1,50 +1,50 @@
 package ch.bernmobil.vibe.shared;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.jooq.DSLContext;
+import org.jooq.DeleteWhereStep;
+import org.jooq.Record;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.table;
+
+/**
+ * Repository class to operate on all tables of the schedule database. It is used to delete rows with an outdated
+ * {@link Timestamp}.
+ */
 @Repository
 public class UpdateManagerRepository {
-    private JdbcTemplate jdbcTemplate;
+    private DSLContext dslContext;
 
-    public UpdateManagerRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public UpdateManagerRepository(DSLContext dslContext) {
+        this.dslContext = dslContext;
     }
 
     public void truncate(String tableName) {
-        jdbcTemplate.update(new QueryBuilder().truncate(tableName).getQuery());
+        dslContext.truncate(table(tableName)).execute();
     }
 
-    public void deleteUpdatesWithInvalidTimestamp(String table, List<Timestamp> lastUpdates) {
-        ArrayList<QueryBuilder.Predicate> predicates = new ArrayList<>();
+    public void deleteUpdatesWithInvalidTimestamp(String tableName, List<Timestamp> lastUpdates) {
+        DeleteWhereStep<Record> deleteQuery = dslContext.delete(table(tableName));
         for (Timestamp timestamp : lastUpdates) {
-            predicates.add(QueryBuilder.Predicate.notEquals("update", String.format("'%s'", timestamp)));
+            deleteQuery.where(field("update").notEqual(timestamp));
         }
-        QueryBuilder.Predicate predicate = QueryBuilder.Predicate.joinAnd(predicates);
-        jdbcTemplate.update(new QueryBuilder()
-                .delete(table)
-                .where(predicate)
-                .getQuery());
+        deleteQuery.execute();
     }
 
-    public void deleteUpdatesWithInvalidTimestamp(String[] tables, List<Timestamp> lastUpdates) {
-        for (String table : tables) {
+    public void deleteUpdatesWithInvalidTimestamp(String[] tableNames, List<Timestamp> lastUpdates) {
+        for (String table : tableNames) {
             deleteUpdatesWithInvalidTimestamp(table, lastUpdates);
         }
     }
 
-    public void deleteByUpdateTimestamp(String table, Timestamp updateTimestamp, String timestampColumn) {
-        jdbcTemplate.update(new QueryBuilder()
-                .delete(table)
-                .where(QueryBuilder.Predicate.equals(timestampColumn, String.format("'%s'", updateTimestamp)))
-                .getQuery());
+    public void deleteByUpdateTimestamp(String tableName, Timestamp updateTimestamp, String timestampColumn) {
+        dslContext.delete(table(tableName))
+                .where(field(timestampColumn).eq(updateTimestamp))
+                .execute();
     }
 
     public void deleteByUpdateTimestamp(String[] tables, Timestamp updateTimestamp) {

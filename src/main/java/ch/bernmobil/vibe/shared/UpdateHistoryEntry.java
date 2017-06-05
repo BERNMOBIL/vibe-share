@@ -3,8 +3,11 @@ package ch.bernmobil.vibe.shared;
 import java.sql.Timestamp;
 
 public class UpdateHistoryEntry {
-        private Timestamp time;
+    private Timestamp time;
     private UpdateManager.Status status;
+
+    public UpdateHistoryEntry() {
+    }
 
     public UpdateHistoryEntry(Timestamp time, UpdateManager.Status status) {
         this.time = time;
