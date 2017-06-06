@@ -1,7 +1,6 @@
 package ch.bernmobil.vibe.shared;
 
 import ch.bernmobil.vibe.shared.contract.UpdateHistoryContract;
-import ch.bernmobil.vibe.shared.entitiy.UpdateHistory;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
@@ -12,7 +11,6 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.bernmobil.vibe.shared.UpdateManager.Status;
