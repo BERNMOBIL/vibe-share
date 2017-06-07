@@ -6,8 +6,6 @@ public class Journey {
     private UUID id;
     private String headsign;
     private UUID route;
-
-
     private UUID terminalStation;
 
     public Journey(UUID id, String headsign, UUID route, UUID terminalStation) {

@@ -13,7 +13,6 @@ public class Schedule {
 
     public Schedule(UUID id, String platform, Time plannedArrival, Time plannedDeparture, UUID stop, UUID journey) {
         this.id = id;
-
         this.platform = platform;
         this.plannedArrival = plannedArrival;
         this.plannedDeparture = plannedDeparture;

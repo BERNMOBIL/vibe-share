@@ -1,10 +1,14 @@
 package ch.bernmobil.vibe.shared.mapping;
 
 import java.util.UUID;
+import javax.persistence.Column;
 
 public class JourneyMapping {
+    @Column(name = "gtfs_trip_id")
     private String gtfsTripId;
+    @Column(name = "gtfs_service_id")
     private String gtfsServiceId;
+    @Column(name = "id")
     private UUID id;
 
     public JourneyMapping(String gtfsTripId, String gtfsServiceId, UUID id) {
