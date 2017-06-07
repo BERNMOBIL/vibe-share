@@ -15,10 +15,8 @@ import static java.util.stream.Collectors.toList;
 
 @Component
 public class UpdateManager {
-
     private final UpdateManagerRepository mapperRepository;
     private final UpdateManagerRepository staticRepository;
-
     private static final String[] TABLES_TO_DELETE = {ScheduleContract.TABLE_NAME,
             CalendarDateContract.TABLE_NAME,
             CalendarExceptionContract.TABLE_NAME,
@@ -26,33 +24,30 @@ public class UpdateManager {
             RouteContract.TABLE_NAME,
             StopContract.TABLE_NAME,
             AreaContract.TABLE_NAME};
-
     private static final String[] MAPPING_TABLES_TO_DELETE = { AreaMapperContract.TABLE_NAME,
             CalendarDateMapperContract.TABLE_NAME,
             JourneyMapperContract.TABLE_NAME,
             RouteMapperContract.TABLE_NAME,
             StopMapperContract.TABLE_NAME};
-
     private final int updateHistoryLength;
     private final long updateTimeoutMilliseconds;
-
     private final UpdateHistoryRepository updateHistoryRepository;
+    private final UpdateTimestampManager updateTimestampManager;
 
-    private static Timestamp activeUpdateTimestamp;
-
-    //TODO
     public enum Status {IN_PROGRESS, SUCCESS, FAILED}
 
     public UpdateManager(UpdateManagerRepository mapperRepository,
                          UpdateManagerRepository staticRepository,
                          UpdateHistoryRepository updateHistoryRepository,
                          int updateHistoryLength,
-                         Duration updateTimeout) {
+                         Duration updateTimeout,
+                         UpdateTimestampManager updateTimestampManager) {
         this.mapperRepository = mapperRepository;
         this.staticRepository = staticRepository;
         this.updateHistoryRepository = updateHistoryRepository;
         this.updateHistoryLength = updateHistoryLength;
         this.updateTimeoutMilliseconds = updateTimeout.toMillis();
+        this.updateTimestampManager = updateTimestampManager;
     }
 
 
@@ -62,8 +57,8 @@ public class UpdateManager {
         updateHistoryRepository.insert(newEntry);
         return now;
     }
-    public static void startUpdate(Timestamp timestamp) {
-        activeUpdateTimestamp = timestamp;
+    public void startUpdate(Timestamp timestamp) {
+        updateTimestampManager.setActiveUpdateTimestamp(timestamp);
     }
 
     public void cleanOldData() {
@@ -75,8 +70,8 @@ public class UpdateManager {
     }
 
     public void repairFailedUpdate() {
-        if(UpdateManager.activeUpdateTimestamp != null) {
-            Timestamp failedUpdateTimestamp = UpdateManager.activeUpdateTimestamp;
+        if(updateTimestampManager.getActiveUpdateTimestamp() != null) {
+            Timestamp failedUpdateTimestamp = updateTimestampManager.getActiveUpdateTimestamp();
             staticRepository.deleteByUpdateTimestamp(TABLES_TO_DELETE, failedUpdateTimestamp);
             mapperRepository.deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, failedUpdateTimestamp);
         }
@@ -100,7 +95,7 @@ public class UpdateManager {
     }
 
     public void setStatus(Status status) {
-        UpdateHistoryEntry element = updateHistoryRepository.findByTimestamp(activeUpdateTimestamp);
+        UpdateHistoryEntry element = updateHistoryRepository.findByTimestamp(updateTimestampManager.getActiveUpdateTimestamp());
         element.setStatus(status);
         updateHistoryRepository.update(element);
     }
@@ -111,9 +106,5 @@ public class UpdateManager {
 
     public int getRowCount() {
         return updateHistoryRepository.count();
-    }
-
-    public static Timestamp getActiveUpdateTimestamp() {
-        return activeUpdateTimestamp;
     }
 }
