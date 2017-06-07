@@ -8,10 +8,10 @@ public class UpdateHistory {
     private String status;
 
     public UpdateHistory(int id, Timestamp time, String status) {
+        this(time, status);
         this.id = id;
-        this.time = time;
-        this.status = status;
     }
+
     public UpdateHistory(Timestamp time, String status) {
         this.time = time;
         this.status = status;
