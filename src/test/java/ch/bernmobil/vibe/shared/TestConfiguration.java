@@ -22,6 +22,12 @@ public class TestConfiguration {
         return new UpdateManagerRepository(mockedDslContext());
     }
 
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public UpdateHistoryRepository updateHistoryRepository() {
+        return new UpdateHistoryRepository(mockedDslContext());
+    }
+
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)

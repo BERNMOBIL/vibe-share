@@ -28,6 +28,7 @@ public class UpdateHistoryRepository {
     public UpdateHistoryEntry findByTimestamp(Timestamp timestamp) {
         return dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
                 .where(field(UpdateHistoryContract.TIME).equal(timestamp))
+                .limit(1)
                 .fetchOne()
                 .into(UpdateHistoryEntry.class);
     }
