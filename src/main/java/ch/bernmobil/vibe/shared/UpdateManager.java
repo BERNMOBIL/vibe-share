@@ -57,6 +57,7 @@ public class UpdateManager {
         updateHistoryRepository.insert(newEntry);
         return now;
     }
+
     public void startUpdate(Timestamp timestamp) {
         updateTimestampManager.setActiveUpdateTimestamp(timestamp);
     }
