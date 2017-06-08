@@ -1,6 +1,8 @@
 package ch.bernmobil.vibe.shared.contract;
 
 public final class AreaContract {
+    private AreaContract(){}
+
     public final static String TABLE_NAME = "area";
     public final static String ID = "id";
     public final static String NAME = "name";

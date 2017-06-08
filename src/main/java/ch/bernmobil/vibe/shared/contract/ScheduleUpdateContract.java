@@ -1,6 +1,8 @@
 package ch.bernmobil.vibe.shared.contract;
 
 public final class ScheduleUpdateContract {
+    private ScheduleUpdateContract() {};
+
     public final static String TABLE_NAME = "schedule_update";
     public final static String ID = "id";
     public final static String SCHEDULE = "schedule";

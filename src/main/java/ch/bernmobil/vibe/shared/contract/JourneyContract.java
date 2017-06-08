@@ -1,6 +1,8 @@
 package ch.bernmobil.vibe.shared.contract;
 
 public final class JourneyContract {
+    private JourneyContract(){};
+
     public final static String TABLE_NAME = "journey";
     public final static String ID = "id";
     public final static String HEADSIGN = "headsign";

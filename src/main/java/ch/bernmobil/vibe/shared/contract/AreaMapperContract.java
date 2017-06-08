@@ -1,7 +1,8 @@
 package ch.bernmobil.vibe.shared.contract;
 
 public final class AreaMapperContract {
-    public AreaMapperContract(){}
+    private AreaMapperContract(){}
+
     public final static String TABLE_NAME = "area_mapper";
     public final static String GTFS_ID = "gtfs_id";
     public final static String ID = "id";

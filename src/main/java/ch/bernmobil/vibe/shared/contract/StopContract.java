@@ -1,6 +1,7 @@
 package ch.bernmobil.vibe.shared.contract;
 
 public final class StopContract {
+    private StopContract() {};
     public final static String TABLE_NAME = "stop";
     public final static String ID = "id";
     public final static String NAME = "name";

@@ -1,7 +1,8 @@
 package ch.bernmobil.vibe.shared.contract;
 
 public final class JourneyMapperContract {
-    public JourneyMapperContract(){}
+    private JourneyMapperContract(){}
+
     public final static String TABLE_NAME = "journey_mapper";
     public final static String GTFS_TRIP_ID = "gtfs_trip_id";
     public final static String GTFS_SERVICE_ID = "gtfs_service_id";

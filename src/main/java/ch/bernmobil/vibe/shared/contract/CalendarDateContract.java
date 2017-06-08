@@ -1,6 +1,8 @@
 package ch.bernmobil.vibe.shared.contract;
 
 public final class CalendarDateContract {
+    private CalendarDateContract(){}
+
     public final static String TABLE_NAME = "calendar_date";
     public final static String ID = "id";
     public final static String VALID_FROM = "valid_from";
