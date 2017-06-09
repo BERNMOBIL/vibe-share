@@ -1,4 +1,4 @@
-package ch.bernmobil.vibe.shared.entitiy;
+package ch.bernmobil.vibe.shared.entity;
 
 import java.sql.Timestamp;
 import java.util.UUID;

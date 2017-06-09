@@ -1,6 +1,7 @@
-package ch.bernmobil.vibe.shared.entitiy;
+package ch.bernmobil.vibe.shared.entity;
 
 import com.google.gson.JsonObject;
+
 import java.sql.Date;
 import java.util.UUID;
 
