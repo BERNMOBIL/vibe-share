@@ -1,6 +1,6 @@
 package ch.bernmobil.vibe.shared.mockdata;
 
-import ch.bernmobil.vibe.shared.entitiy.Journey;
+import ch.bernmobil.vibe.shared.entity.Journey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

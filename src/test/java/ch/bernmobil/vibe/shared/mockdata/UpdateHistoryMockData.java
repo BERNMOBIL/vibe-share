@@ -1,7 +1,6 @@
 package ch.bernmobil.vibe.shared.mockdata;
 
-import ch.bernmobil.vibe.shared.entitiy.UpdateHistory;
-
+import ch.bernmobil.vibe.shared.entity.UpdateHistory;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,15 +34,15 @@ public class UpdateHistoryMockData {
     }
 
     public static List<UpdateHistory> getDataSourceWithValidUpdateCollision() {
-        dataSourceWithValidUpdateCollision = getDataSource();
-        Timestamp collision = new Timestamp(System.currentTimeMillis() - 5000);
+        dataSourceWithValidUpdateCollision = new ArrayList<>(getDataSource());
+        Timestamp collision = new Timestamp(System.currentTimeMillis() - 2 * 60 * 1000);
         dataSourceWithValidUpdateCollision.add(new UpdateHistory(collision, "IN_PROGRESS"));
         return dataSourceWithValidUpdateCollision;
     }
 
     public static List<UpdateHistory> getDataSourceWithInvalidUpdateCollision() {
-        dataSourceWithInvalidUpdateCollision = getDataSource();
-        Timestamp invalidCollision = new Timestamp(System.currentTimeMillis() - 5000000);
+        dataSourceWithInvalidUpdateCollision = new ArrayList<>(getDataSource());
+        Timestamp invalidCollision = new Timestamp(System.currentTimeMillis() - 5 * 60 * 60 * 1000);
         dataSourceWithInvalidUpdateCollision.add(new UpdateHistory(invalidCollision, "IN_PROGRESS"));
         return dataSourceWithInvalidUpdateCollision;
     }

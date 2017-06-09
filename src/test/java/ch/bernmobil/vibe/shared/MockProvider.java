@@ -1,12 +1,14 @@
 package ch.bernmobil.vibe.shared;
 
-import ch.bernmobil.vibe.shared.entitiy.UpdateHistory;
+import ch.bernmobil.vibe.shared.entity.Schedule;
+import ch.bernmobil.vibe.shared.entity.UpdateHistory;
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import ch.bernmobil.vibe.shared.mockdata.JourneyMapperMockData;
 import ch.bernmobil.vibe.shared.mockdata.ScheduleMockData;
 import ch.bernmobil.vibe.shared.mockdata.StopMapperMockData;
 import ch.bernmobil.vibe.shared.mockdata.UpdateHistoryMockData;
+import java.util.stream.Collectors;
 import jooq.generated.entities.mappings.tables.records.JourneyMapperRecord;
 import jooq.generated.entities.mappings.tables.records.StopMapperRecord;
 import jooq.generated.entities.static_.tables.records.ScheduleRecord;
@@ -31,10 +33,15 @@ import static jooq.generated.entities.static_.tables.Schedule.SCHEDULE;
 public class MockProvider implements MockDataProvider {
 
     private QueryCollector queryCollector;
-    public boolean actLikeUpdateHistoryIsEmpty = false;
-    public boolean actLikeUpdateHistoryhasValidCollision = false;
-    public boolean actLikeUpdateHistoryhasInvalidCollision = false;
+    public boolean actLikeUpdateHistoryIsEmpty;
+    public boolean actLikeUpdateHistoryhasValidCollision;
+    public boolean actLikeUpdateHistoryhasInvalidCollision;
 
+    public void cleanFlags() {
+        actLikeUpdateHistoryIsEmpty = false;
+        actLikeUpdateHistoryhasValidCollision = false;
+        actLikeUpdateHistoryhasInvalidCollision = false;
+    }
 
     @Override
     public MockResult[] execute(MockExecuteContext ctx) throws SQLException {
@@ -50,9 +57,9 @@ public class MockProvider implements MockDataProvider {
 
         if (sql.startsWith("SELECT")){
             if(sql.contains("FROM SCHEDULE")) {
-                List<ch.bernmobil.vibe.shared.entitiy.Schedule> mockedSchedules = ScheduleMockData.getDataSource();
+                List<Schedule> mockedSchedules = ScheduleMockData.getDataSource();
                 Result<ScheduleRecord> result = create.newResult(SCHEDULE);
-                for(ch.bernmobil.vibe.shared.entitiy.Schedule mockSchedule : mockedSchedules) {
+                for(Schedule mockSchedule : mockedSchedules) {
                     ScheduleRecord record = create.newRecord(SCHEDULE);
                     record.setValue(SCHEDULE.ID, mockSchedule.getId());
                     record.setValue(SCHEDULE.JOURNEY, mockSchedule.getJourney());
@@ -95,7 +102,8 @@ public class MockProvider implements MockDataProvider {
                     mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSource();
                 }
                 if(sql.contains("ORDER BY TIME DESC")) {
-                    Collections.sort(mockedUpdateHistoryEntries, Comparator.comparing(UpdateHistory::getTime));
+                    mockedUpdateHistoryEntries = mockedUpdateHistoryEntries.stream()
+                        .sorted(Comparator.comparing(UpdateHistory::getTime)).collect(Collectors.toList());
                     Collections.reverse(mockedUpdateHistoryEntries);
                 }
 

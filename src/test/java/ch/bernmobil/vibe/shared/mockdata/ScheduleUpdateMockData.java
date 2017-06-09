@@ -1,7 +1,7 @@
 package ch.bernmobil.vibe.shared.mockdata;
 
 
-import ch.bernmobil.vibe.shared.entitiy.ScheduleUpdate;
+import ch.bernmobil.vibe.shared.entity.ScheduleUpdate;
 import java.sql.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;

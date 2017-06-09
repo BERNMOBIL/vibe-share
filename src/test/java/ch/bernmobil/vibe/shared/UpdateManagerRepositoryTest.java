@@ -1,9 +1,11 @@
 package ch.bernmobil.vibe.shared;
 
+import java.util.Arrays;
 import org.jooq.Query;
 import org.jooq.tools.jdbc.Mock;
 import org.jooq.tools.jdbc.MockDataProvider;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,36 +23,49 @@ import java.util.List;
 public class UpdateManagerRepositoryTest {
     private UpdateManagerRepository updateManagerRepository;
     private MockProvider mockProvider;
+    private QueryCollector queryCollector;
+    private TestHelper testHelper;
+
+    @Before
+    public void beforeTest() {
+        queryCollector = new QueryCollector();
+        mockProvider.useQueryCollector(queryCollector);
+        mockProvider.cleanFlags();
+        testHelper = new TestHelper(queryCollector);
+    }
 
     @Test
     public void prepareUpdateTest() {
-        final String expectedQuery = "TRUNCATE TABLE SCHEDULE_UPDATE";
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
+        final String[] expectedQueries = {
+            "TRUNCATE TABLE SCHEDULE_UPDATE"
+        };
+        final Object[][] expectedBindings = {
+            {}
+        };
         updateManagerRepository.truncate("SCHEDULE_UPDATE");
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
 
     @Test
     public void deleteInvalidUpdatesTest() {
-        final String expectedQuery = "DELETE FROM SCHEDULE WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))";
-        List<Timestamp> validTimestamps = new ArrayList<>();
-        validTimestamps.add(Timestamp.valueOf("2017-06-02 15:48:05"));
-        validTimestamps.add(Timestamp.valueOf("2017-06-03 15:48:05"));
-        validTimestamps.add(Timestamp.valueOf("2017-06-04 15:48:05"));
-        String tableName = "SCHEDULE";
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
-        updateManagerRepository.deleteUpdatesWithInvalidTimestamp(tableName, validTimestamps);
+        final String[] expectedQueries = {
+            "DELETE FROM SCHEDULE WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))"
+        };
+        final Timestamp[] validTimestamps = {
+            Timestamp.valueOf("2017-06-02 15:48:05"),
+            Timestamp.valueOf("2017-06-03 15:48:05"),
+            Timestamp.valueOf("2017-06-04 15:48:05")
+        };
+        final Object[][] expectedBindings = {
+            validTimestamps
+        };
+        final String tableName = "SCHEDULE";
+        updateManagerRepository.deleteUpdatesWithInvalidTimestamp(tableName, Arrays.asList(validTimestamps));
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(3, queryCollector.bindings.size());
-        Assert.assertEquals(validTimestamps.get(0), queryCollector.bindings.get(0));
-        Assert.assertEquals(validTimestamps.get(1), queryCollector.bindings.get(1));
-        Assert.assertEquals(validTimestamps.get(2), queryCollector.bindings.get(2));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
 
     @Test
@@ -60,40 +75,39 @@ public class UpdateManagerRepositoryTest {
                 "DELETE FROM SCHEDULE_UPDATE WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))",
                 "DELETE FROM JOURNEY WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))"
         };
-        List<Timestamp> validTimestamps = new ArrayList<>();
-        validTimestamps.add(Timestamp.valueOf("2017-06-02 15:48:05"));
-        validTimestamps.add(Timestamp.valueOf("2017-06-03 15:48:05"));
-        validTimestamps.add(Timestamp.valueOf("2017-06-04 15:48:05"));
+        final Timestamp[] validTimestamps = {
+            Timestamp.valueOf("2017-06-02 15:48:05"),
+            Timestamp.valueOf("2017-06-03 15:48:05"),
+            Timestamp.valueOf("2017-06-04 15:48:05")
+        };
+        final Object[][] expectedBindings = {
+            validTimestamps,
+            validTimestamps,
+            validTimestamps
+        };
         final String[] tableNames = {"SCHEDULE", "SCHEDULE_UPDATE", "JOURNEY"};
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
-        updateManagerRepository.deleteUpdatesWithInvalidTimestamp(tableNames, validTimestamps);
+        updateManagerRepository.deleteUpdatesWithInvalidTimestamp(tableNames, Arrays.asList(validTimestamps));
 
-        Assert.assertEquals(3, queryCollector.queries.size());
-        Assert.assertEquals(expectedQueries[0], queryCollector.queries.get(0));
-        Assert.assertEquals(expectedQueries[1], queryCollector.queries.get(1));
-        Assert.assertEquals(expectedQueries[2], queryCollector.queries.get(2));
-        Assert.assertEquals(3, queryCollector.bindings.size());
-        Assert.assertEquals(validTimestamps.get(0), queryCollector.bindings.get(0));
-        Assert.assertEquals(validTimestamps.get(1), queryCollector.bindings.get(1));
-        Assert.assertEquals(validTimestamps.get(2), queryCollector.bindings.get(2));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
 
     @Test
     public void deleteByUpdateTimestampTest() {
-        final String expectedQuery = "DELETE FROM SCHEDULE WHERE UPDATE = CAST(? AS TIMESTAMP)";
+        final String[] expectedQueries = {
+            "DELETE FROM SCHEDULE WHERE UPDATE = CAST(? AS TIMESTAMP)"
+        };
         final Timestamp timestamp = Timestamp.valueOf("2017-06-02 15:48:05");
         final String tableName = "SCHEDULE";
         final String timestampColumn = "UPDATE";
+        final Object[][] expectedBindings = {
+            {timestamp}
+        };
 
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
         updateManagerRepository.deleteByUpdateTimestamp(tableName, timestamp, timestampColumn);
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(1, queryCollector.bindings.size());
-        Assert.assertEquals(timestamp, queryCollector.bindings.get(0));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
 
     @Test
@@ -105,17 +119,16 @@ public class UpdateManagerRepositoryTest {
         };
         final Timestamp timestamp = Timestamp.valueOf("2017-06-02 15:48:05");
         final String[] tableNames = {"SCHEDULE", "JOURNEY", "SCHEDULE_UPDATE"};
+        final Object[][] expectedBindings = {
+            {timestamp},
+            {timestamp},
+            {timestamp}
+        };
 
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
         updateManagerRepository.deleteByUpdateTimestamp(tableNames, timestamp);
 
-        Assert.assertEquals(3, queryCollector.queries.size());
-        Assert.assertEquals(expectedQueries[0], queryCollector.queries.get(0));
-        Assert.assertEquals(expectedQueries[1], queryCollector.queries.get(1));
-        Assert.assertEquals(expectedQueries[2], queryCollector.queries.get(2));
-        Assert.assertEquals(1, queryCollector.bindings.size());
-        Assert.assertEquals(timestamp, queryCollector.bindings.get(0));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
 
     @Autowired

@@ -1,5 +1,6 @@
 package ch.bernmobil.vibe.shared;
 
+import ch.bernmobil.vibe.shared.UpdateManager.Status;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,94 +20,102 @@ import java.util.List;
 public class UpdateHistoryRepositoryTest {
     private UpdateHistoryRepository updateHistoryRepository;
     private MockProvider mockProvider;
+    private QueryCollector queryCollector;
+    private TestHelper testHelper;
 
     @Before
     public void beforeTest() {
-        mockProvider.actLikeUpdateHistoryIsEmpty = false;
+        queryCollector = new QueryCollector();
+        mockProvider.useQueryCollector(queryCollector);
+        mockProvider.cleanFlags();
+        testHelper = new TestHelper(queryCollector);
     }
 
     @Test
     public void findUpdateHistoryEntryByTimestampTest() {
-        final String expectedQuery = "SELECT * FROM UPDATE_HISTORY WHERE TIME = CAST(? AS TIMESTAMP) LIMIT ?";
         final Timestamp timestamp = Timestamp.valueOf("2017-06-02 15:48:05");
+        final String[] expectedQueries = {
+            "SELECT * FROM UPDATE_HISTORY WHERE TIME = CAST(? AS TIMESTAMP) LIMIT ?"
+        };
+        final Object[][] expectedBindings = {
+            {timestamp, 1}
+        };
         final UpdateHistoryEntry expectedResult = new UpdateHistoryEntry(timestamp, UpdateManager.Status.FAILED);
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
         UpdateHistoryEntry actualResult = updateHistoryRepository.findByTimestamp(timestamp);
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(2, queryCollector.bindings.size());
-        Assert.assertEquals(timestamp, queryCollector.bindings.get(0));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
         Assert.assertEquals(expectedResult.getStatus(), actualResult.getStatus());
         Assert.assertEquals(expectedResult.getTime(), actualResult.getTime());
     }
 
     @Test
     public void findLastSuccessUpdateHistoryEntryTest() {
-        final String expectedQuery = "SELECT * FROM UPDATE_HISTORY WHERE STATUS = ? ORDER BY TIME DESC LIMIT ?";
+        final String[] expectedQueries = {
+            "SELECT * FROM UPDATE_HISTORY WHERE STATUS = ? ORDER BY TIME DESC LIMIT ?"
+        };
+        final Object[][] expectedBindings = {
+            {Status.SUCCESS.toString(), 1}
+        };
         final UpdateHistoryEntry expectedResult = new UpdateHistoryEntry(Timestamp.valueOf("2017-06-04 15:48:05"), UpdateManager.Status.SUCCESS);
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
         UpdateHistoryEntry actualResult = updateHistoryRepository.findLastSuccessUpdate();
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(2, queryCollector.bindings.size());
-        Assert.assertEquals(UpdateManager.Status.SUCCESS.toString(), queryCollector.bindings.get(0));
-        Assert.assertEquals(1, queryCollector.bindings.get(1));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
         Assert.assertEquals(expectedResult.getStatus(), actualResult.getStatus());
         Assert.assertEquals(expectedResult.getTime(), actualResult.getTime());
     }
 
     @Test
     public void findLastUpdate() {
-        final String expectedQuery = "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?";
+        final String[] expectedQueries = {
+            "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?"
+        };
         final UpdateHistoryEntry expectedResult = new UpdateHistoryEntry(Timestamp.valueOf("2017-06-04 15:48:05"), UpdateManager.Status.SUCCESS);
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
+        final Object[][] expectedBindings = {
+            {1}
+        };
         UpdateHistoryEntry actualResult = updateHistoryRepository.findLastUpdate();
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(1, queryCollector.bindings.size());
-        Assert.assertEquals(1, queryCollector.bindings.get(0));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
         Assert.assertEquals(expectedResult.getStatus(), actualResult.getStatus());
         Assert.assertEquals(expectedResult.getTime(), actualResult.getTime());
     }
     @Test
     public void findLastWithEmptyDatabaseUpdate() {
-        final String expectedQuery = "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?";
-        final UpdateHistoryEntry expectedResult = null;
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
+        final String[] expectedQueries = {
+            "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?"
+        };
+        final Object[][] expectedBindings = {
+            {1}
+        };
         mockProvider.actLikeUpdateHistoryIsEmpty = true;
         UpdateHistoryEntry actualResult = updateHistoryRepository.findLastUpdate();
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(1, queryCollector.bindings.size());
-        Assert.assertEquals(1, queryCollector.bindings.get(0));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
         Assert.assertNull(actualResult);
     }
 
     @Test
     public void findLatestNUpdates() {
-        final String expectedQuery = "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?";
+        final String[] expectedQueries = {
+            "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?"
+        };
+        final Object[][] expectedBindings = {
+            {1}
+        };
         final int numUpdates = 2;
         final UpdateHistoryEntry[] expectedResult = {
                 new UpdateHistoryEntry(Timestamp.valueOf("2017-06-04 15:48:05"), UpdateManager.Status.SUCCESS),
                 new UpdateHistoryEntry(Timestamp.valueOf("2017-06-03 15:48:05"), UpdateManager.Status.IN_PROGRESS),
         };
 
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
         List<UpdateHistoryEntry> actualResult = updateHistoryRepository.findLatestNUpdates(numUpdates);
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(1, queryCollector.bindings.size());
-        Assert.assertEquals(numUpdates, queryCollector.bindings.get(0));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
         Assert.assertEquals(expectedResult[0].getTime(), actualResult.get(0).getTime());
         Assert.assertEquals(expectedResult[0].getStatus(), actualResult.get(0).getStatus());
         Assert.assertEquals(expectedResult[1].getTime(), actualResult.get(1).getTime());
@@ -114,69 +123,70 @@ public class UpdateHistoryRepositoryTest {
     }
     @Test
     public void findLatestNUpdatesWithEmtpyDatabase() {
-        final String expectedQuery = "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?";
+        final String[] expectedQueries = {
+            "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?"
+        };
+        final Object[][] expectedBindings = {
+            {1}
+        };
         final int numUpdates = 2;
 
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
         mockProvider.actLikeUpdateHistoryIsEmpty = true;
         List<UpdateHistoryEntry> actualResult = updateHistoryRepository.findLatestNUpdates(numUpdates);
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(1, queryCollector.bindings.size());
-        Assert.assertEquals(numUpdates, queryCollector.bindings.get(0));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
         Assert.assertTrue(actualResult.isEmpty());
     }
 
     @Test
     public void insertValidSuccessUpdateHistoryTest() {
-        final String expectedQuery = "INSERT INTO UPDATE_HISTORY (TIME, STATUS) VALUES (CAST(? AS TIMESTAMP), ?)";
         Timestamp timestamp = Timestamp.valueOf("2017-06-04 15:48:05");
+        final String[] expectedQueries = {
+            "INSERT INTO UPDATE_HISTORY (TIME, STATUS) VALUES (CAST(? AS TIMESTAMP), ?)"
+        };
+        final Object[][] expectedBindings = {
+            {timestamp, Status.SUCCESS.toString()}
+        };
         final UpdateHistoryEntry updateHistoryEntry = new UpdateHistoryEntry(timestamp, UpdateManager.Status.SUCCESS);
 
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
         updateHistoryRepository.insert(updateHistoryEntry);
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(2, queryCollector.bindings.size());
-        Assert.assertEquals(timestamp, queryCollector.bindings.get(0));
-        Assert.assertEquals(UpdateManager.Status.SUCCESS.toString(), queryCollector.bindings.get(1));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
     @Test
     public void insertValidInProgressUpdateHistoryTest() {
-        final String expectedQuery = "INSERT INTO UPDATE_HISTORY (TIME, STATUS) VALUES (CAST(? AS TIMESTAMP), ?)";
-        Timestamp timestamp = Timestamp.valueOf("2017-06-04 15:48:05");
+        final Timestamp timestamp = Timestamp.valueOf("2017-06-04 15:48:05");
         final UpdateHistoryEntry updateHistoryEntry = new UpdateHistoryEntry(timestamp, UpdateManager.Status.IN_PROGRESS);
+        final String[] expectedQueries = {
+            "INSERT INTO UPDATE_HISTORY (TIME, STATUS) VALUES (CAST(? AS TIMESTAMP), ?)"
+        };
+        final Object[][] expectedBindings = {
+            {timestamp, Status.SUCCESS.toString()}
+        };
 
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
         updateHistoryRepository.insert(updateHistoryEntry);
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(2, queryCollector.bindings.size());
-        Assert.assertEquals(timestamp, queryCollector.bindings.get(0));
-        Assert.assertEquals(UpdateManager.Status.IN_PROGRESS.toString(), queryCollector.bindings.get(1));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
 
     @Test
     public void updateHistoryEntryTest() {
-        final String expectedQuery = "UPDATE UPDATE_HISTORY SET STATUS = ? WHERE TIME = CAST(? AS TIMESTAMP)";
         Timestamp timestamp = Timestamp.valueOf("2017-06-04 15:48:05");
         final UpdateHistoryEntry updateHistoryEntry = new UpdateHistoryEntry(timestamp, UpdateManager.Status.IN_PROGRESS);
+        final String[] expectedQueries = {
+            "UPDATE UPDATE_HISTORY SET STATUS = ? WHERE TIME = CAST(? AS TIMESTAMP)"
+        };
+        final Object[][] expectedBindings = {
+            {Status.IN_PROGRESS.toString(), timestamp}
+        };
 
-        QueryCollector queryCollector = new QueryCollector();
-        mockProvider.useQueryCollector(queryCollector);
         updateHistoryRepository.update(updateHistoryEntry);
 
-        Assert.assertEquals(1, queryCollector.queries.size());
-        Assert.assertEquals(expectedQuery, queryCollector.queries.get(0));
-        Assert.assertEquals(2, queryCollector.bindings.size());
-        Assert.assertEquals(UpdateManager.Status.IN_PROGRESS.toString(), queryCollector.bindings.get(0));
-        Assert.assertEquals(timestamp, queryCollector.bindings.get(1));
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
 
 

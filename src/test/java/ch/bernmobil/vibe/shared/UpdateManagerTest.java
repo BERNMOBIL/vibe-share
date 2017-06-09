@@ -19,53 +19,30 @@ public class UpdateManagerTest {
     private QueryCollector queryCollector;
     private UpdateManager updateManager;
     private UpdateTimestampManager updateTimestampManager;
+    private TestHelper testHelper;
 
     @Before
     public void beforeTest() {
-        mockProvider.actLikeUpdateHistoryIsEmpty = false;
-        mockProvider.actLikeUpdateHistoryhasInvalidCollision = false;
-        mockProvider.actLikeUpdateHistoryhasValidCollision = false;
         queryCollector = new QueryCollector();
         mockProvider.useQueryCollector(queryCollector);
-    }
-
-    private void assertBindings(Object[][] expectedBindings) {
-        assertBindings(expectedBindings, 1000);
-    }
-
-    private void assertBindings(Object[][] expectedBindings, long timestampDelta) {
-        Assert.assertEquals(expectedBindings.length, queryCollector.bindings.size());
-
-        for(int i = 0; i < expectedBindings.length; i++) {
-            Object[] queryBindings = expectedBindings[i];
-            Assert.assertEquals(expectedBindings[i].length, queryCollector.bindings.get(i).size());
-            for(int j = 0; j < queryBindings.length; j++) {
-                if(queryBindings[j] instanceof Timestamp) {
-                    Assert.assertEquals(((Timestamp)expectedBindings[i][j]).getTime(),((Timestamp)queryCollector.bindings.get(i).get(j)).getTime(), timestampDelta);
-                } else {
-                    Assert.assertEquals(expectedBindings[i][j], queryBindings[j]);
-                }
-            }
-        }
-    }
-
-    private void assertQueries(String[] expectedQueries) {
-        Assert.assertEquals(expectedQueries.length, queryCollector.queries.size());
-        Assert.assertArrayEquals(expectedQueries, queryCollector.queries.toArray(new String[queryCollector.queries.size()]));
+        mockProvider.cleanFlags();
+        testHelper = new TestHelper(queryCollector);
     }
 
     @Test
     public void findUpdateHistoryEntryByTimestampTest() {
         final Timestamp expectedTimestamp = new Timestamp(System.currentTimeMillis());
-        final String[] expectedQueries = { "INSERT INTO UPDATE_HISTORY (TIME, STATUS) VALUES (CAST(? AS TIMESTAMP), ?)" };
+        final String[] expectedQueries = {
+            "INSERT INTO UPDATE_HISTORY (TIME, STATUS) VALUES (CAST(? AS TIMESTAMP), ?)"
+        };
         final Object[][] expectedBindings = {
                 { expectedTimestamp, UpdateManager.Status.IN_PROGRESS.toString() }
         };
 
         Timestamp resultingTimestamp = updateManager.prepareUpdate();
 
-        assertQueries(expectedQueries);
-        assertBindings(expectedBindings);
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
         Assert.assertEquals(expectedTimestamp.getTime(), resultingTimestamp.getTime(), 1000);
     }
 
@@ -116,8 +93,8 @@ public class UpdateManagerTest {
 
         updateManager.cleanOldData();
 
-        assertQueries(expectedQueries);
-        assertBindings(expectedBindings);
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
 
     @Test
@@ -156,42 +133,46 @@ public class UpdateManagerTest {
         updateTimestampManager.setActiveUpdateTimestamp(now);
         updateManager.repairFailedUpdate();
 
-        assertQueries(expectedQueries);
-        assertBindings(expectedBindings);
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
 
     }
 
     @Test
     public void hasUpdateCollisionWithoutCollisionTest() {
-        final String[] expectedQueries = { "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?" };
+        final String[] expectedQueries = {
+            "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?"
+        };
         final Object[][] expectedBindings = {
                 {1}
         };
 
         boolean result = updateManager.hasUpdateCollision();
-        assertQueries(expectedQueries);
-        assertBindings(expectedBindings);
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
         Assert.assertFalse(result);
     }
 
 
     @Test
     public void hasUpdateCollisionWithValidCollisionTest() {
-        final String[] expectedQueries = {"SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?" };
+        final String[] expectedQueries = {
+            "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?"
+        };
         final Object[][] expectedBindings = {
                 {1}
         };
         mockProvider.actLikeUpdateHistoryhasValidCollision = true;
         boolean result = updateManager.hasUpdateCollision();
-        assertQueries(expectedQueries);
-        assertBindings(expectedBindings);
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
         Assert.assertTrue(result);
     }
 
 
     @Test
     public void hasUpdateCollisionWithInvalidCollisionTest() {
-        final Timestamp expectedTimestamp = new Timestamp(System.currentTimeMillis() - 5000000);
+        final Timestamp expectedTimestamp = new Timestamp(System.currentTimeMillis() -  5 * 60 * 60 * 1000);
         final String[] expectedQueries = {
                 "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?",
                 "UPDATE UPDATE_HISTORY SET STATUS = ? WHERE TIME = CAST(? AS TIMESTAMP)",
@@ -226,16 +207,16 @@ public class UpdateManagerTest {
         };
         mockProvider.actLikeUpdateHistoryhasInvalidCollision = true;
         boolean result = updateManager.hasUpdateCollision();
-        assertQueries(expectedQueries);
-        assertBindings(expectedBindings);
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
         Assert.assertFalse(result);
     }
 
     @Test
     public void setStatusTest() {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        Timestamp timestamp = Timestamp.valueOf("2017-06-02 15:48:05.0");
         final String[] expectedQueries = {
-                "SELECT * FROM UPDATE_HISTORY WHERE TIME = CAST(? AS VARCHAR) LIMIT ?",
+                "SELECT * FROM UPDATE_HISTORY WHERE TIME = CAST(? AS TIMESTAMP) LIMIT ?",
                 "UPDATE UPDATE_HISTORY SET STATUS = ? WHERE TIME = CAST(? AS TIMESTAMP)",
         };
         final Object[][] expectedBindings = {
@@ -243,22 +224,25 @@ public class UpdateManagerTest {
                 { "FAILED", timestamp }
         };
 
+        updateTimestampManager.setActiveUpdateTimestamp(timestamp);
         updateManager.setStatus(UpdateManager.Status.FAILED);
 
-        assertQueries(expectedQueries);
-        assertBindings(expectedBindings);
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
 
     @Test
     public void removeUpdateTest() {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        final String[] expectedQueries = { "DELETE FROM UPDATE_HISTORY WHERE TIME = CAST(? AS TIMESTAMP)" };
+        final String[] expectedQueries = {
+            "DELETE FROM UPDATE_HISTORY WHERE TIME = CAST(? AS TIMESTAMP)"
+        };
         final Object[][] expectedBindings = {
                 {timestamp}
         };
         updateManager.removeUpdateByTimestamp(timestamp);
-        assertQueries(expectedQueries);
-        assertBindings(expectedBindings);
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
     }
 
 
