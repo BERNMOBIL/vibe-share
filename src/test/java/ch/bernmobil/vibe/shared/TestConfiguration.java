@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 
+import java.time.Duration;
+
 @Configuration
 @Profile("testConfiguration")
 public class TestConfiguration {
@@ -38,8 +40,22 @@ public class TestConfiguration {
     }
 
     @Bean
-    @Scope(value = BeanDefinition.SCOPE_SINGLETON)
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public MockProvider mockProvider() {
         return new MockProvider();
     }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public UpdateManager updateManager() {
+        return new UpdateManager(updateManagerRepository(), updateManagerRepository(), updateHistoryRepository(), 2,
+                Duration.ofMinutes(30), updateTimestampManager());
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public UpdateTimestampManager updateTimestampManager() {
+        return new UpdateTimestampManager();
+    }
+
 }

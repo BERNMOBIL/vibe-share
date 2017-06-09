@@ -21,7 +21,6 @@ import org.jooq.tools.jdbc.MockResult;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static jooq.generated.entities.mappings.Tables.STOP_MAPPER;
 import static jooq.generated.entities.mappings.tables.JourneyMapper.JOURNEY_MAPPER;
@@ -33,6 +32,8 @@ public class MockProvider implements MockDataProvider {
 
     private QueryCollector queryCollector;
     public boolean actLikeUpdateHistoryIsEmpty = false;
+    public boolean actLikeUpdateHistoryhasValidCollision = false;
+    public boolean actLikeUpdateHistoryhasInvalidCollision = false;
 
 
     @Override
@@ -42,11 +43,12 @@ public class MockProvider implements MockDataProvider {
         MockResult[] mock = new MockResult[1];
         String sql = ctx.sql().toUpperCase();
 
+        if(queryCollector != null) {
+            queryCollector.queries.add(sql);
+            queryCollector.bindings.add(new ArrayList<>(Arrays.asList(ctx.bindings())));
+        }
+
         if (sql.startsWith("SELECT")){
-            if(queryCollector != null) {
-                queryCollector.queries.add(sql);
-                queryCollector.bindings = new ArrayList<>(Arrays.asList(ctx.bindings()));
-            }
             if(sql.contains("FROM SCHEDULE")) {
                 List<ch.bernmobil.vibe.shared.entitiy.Schedule> mockedSchedules = ScheduleMockData.getDataSource();
                 Result<ScheduleRecord> result = create.newResult(SCHEDULE);
@@ -83,8 +85,15 @@ public class MockProvider implements MockDataProvider {
                 }
                 mock[0] = new MockResult(mockedStopMappings.size(), result);
             } else if(sql.contains("FROM UPDATE_HISTORY") && !actLikeUpdateHistoryIsEmpty) {
+                List<UpdateHistory> mockedUpdateHistoryEntries;
 
-                List<UpdateHistory> mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSource();
+                if(actLikeUpdateHistoryhasValidCollision) {
+                    mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSourceWithValidUpdateCollision();
+                } else if(actLikeUpdateHistoryhasInvalidCollision) {
+                    mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSourceWithInvalidUpdateCollision();
+                } else {
+                    mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSource();
+                }
                 if(sql.contains("ORDER BY TIME DESC")) {
                     Collections.sort(mockedUpdateHistoryEntries, Comparator.comparing(UpdateHistory::getTime));
                     Collections.reverse(mockedUpdateHistoryEntries);
@@ -104,11 +113,6 @@ public class MockProvider implements MockDataProvider {
                 }
                 mock[0] = new MockResult(mockedUpdateHistoryEntries.size(), result);
             }
-        } else if(sql.startsWith("TRUNCATE TABLE") || sql.startsWith("DELETE") || sql.startsWith("INSERT INTO") || sql.startsWith("UPDATE")) {
-            queryCollector.queries.add(sql);
-            queryCollector.bindings = new ArrayList<>(Arrays.asList(ctx.bindings()));
-        }
-        else {
         }
 
         return mock[0] != null ? mock : new MockResult[0];
@@ -121,5 +125,5 @@ public class MockProvider implements MockDataProvider {
 
 class QueryCollector {
     public List<String> queries = new ArrayList<>();
-    public List<Object> bindings = new ArrayList<>();
+    public List<List<Object>> bindings = new ArrayList<>();
 }

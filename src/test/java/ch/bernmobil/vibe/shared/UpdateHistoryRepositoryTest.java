@@ -184,8 +184,9 @@ public class UpdateHistoryRepositoryTest {
     private void setUpdateHistoryRepository(UpdateHistoryRepository updateHistoryRepository) {
         this.updateHistoryRepository = updateHistoryRepository;
     }
+
     @Autowired
-    private void setMocrovider(MockProvider mockProvider) {
+    private void setMockProvider(MockProvider mockProvider) {
         this.mockProvider = mockProvider;
     }
 

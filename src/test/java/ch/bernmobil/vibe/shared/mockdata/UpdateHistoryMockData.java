@@ -8,6 +8,8 @@ import java.util.List;
 
 public class UpdateHistoryMockData {
     private static List<UpdateHistory> dataSource;
+    private static List<UpdateHistory> dataSourceWithValidUpdateCollision;
+    private static List<UpdateHistory> dataSourceWithInvalidUpdateCollision;
 
     private static Timestamp[] times = {
             Timestamp.valueOf("2017-06-02 15:48:05"),
@@ -30,5 +32,19 @@ public class UpdateHistoryMockData {
         }
 
         return dataSource;
+    }
+
+    public static List<UpdateHistory> getDataSourceWithValidUpdateCollision() {
+        dataSourceWithValidUpdateCollision = getDataSource();
+        Timestamp collision = new Timestamp(System.currentTimeMillis() - 5000);
+        dataSourceWithValidUpdateCollision.add(new UpdateHistory(collision, "IN_PROGRESS"));
+        return dataSourceWithValidUpdateCollision;
+    }
+
+    public static List<UpdateHistory> getDataSourceWithInvalidUpdateCollision() {
+        dataSourceWithInvalidUpdateCollision = getDataSource();
+        Timestamp invalidCollision = new Timestamp(System.currentTimeMillis() - 5000000);
+        dataSourceWithInvalidUpdateCollision.add(new UpdateHistory(invalidCollision, "IN_PROGRESS"));
+        return dataSourceWithInvalidUpdateCollision;
     }
 }
