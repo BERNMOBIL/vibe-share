@@ -1,11 +1,17 @@
 package ch.bernmobil.vibe.shared.contract;
 
+/**
+ * Database contract to define table name and column name for {@link ch.bernmobil.vibe.shared.mapping.StopMapping}.
+ *
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
+ */
 public final class StopMapperContract {
-    private StopMapperContract(){}
-    public final static String TABLE_NAME = "stop_mapper";
-    public final static String GTFS_ID = "gtfs_id";
-    public final static String ID = "id";
-    public final static String UPDATE = "update";
+    public static final String TABLE_NAME = "stop_mapper";
+    public static final String GTFS_ID = "gtfs_id";
+    public static final String ID = "id";
+    public static final String UPDATE = "update";
+    public static final String[] COLUMNS = { GTFS_ID, ID, UPDATE };
 
-    public final static String[] COLUMNS = { GTFS_ID, ID, UPDATE };
+    private StopMapperContract(){}
 }

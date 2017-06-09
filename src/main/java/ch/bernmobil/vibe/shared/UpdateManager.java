@@ -1,14 +1,10 @@
 package ch.bernmobil.vibe.shared;
 
 import ch.bernmobil.vibe.shared.contract.*;
-import java.sql.SQLException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.sql.Timestamp;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;

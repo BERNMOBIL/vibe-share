@@ -17,7 +17,7 @@ import static org.jooq.impl.DSL.table;
  */
 @Repository
 public class UpdateManagerRepository {
-    private DSLContext dslContext;
+    private final DSLContext dslContext;
 
     public UpdateManagerRepository(DSLContext dslContext) {
         this.dslContext = dslContext;
