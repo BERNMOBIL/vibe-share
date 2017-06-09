@@ -1,7 +1,7 @@
 package ch.bernmobil.vibe.shared.contract;
 
 public final class StopMapperContract {
-    public StopMapperContract(){}
+    private StopMapperContract(){}
     public final static String TABLE_NAME = "stop_mapper";
     public final static String GTFS_ID = "gtfs_id";
     public final static String ID = "id";

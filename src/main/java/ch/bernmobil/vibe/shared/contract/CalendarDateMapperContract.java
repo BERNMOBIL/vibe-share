@@ -1,7 +1,8 @@
 package ch.bernmobil.vibe.shared.contract;
 
 public final class CalendarDateMapperContract {
-    public CalendarDateMapperContract(){}
+    private CalendarDateMapperContract(){}
+
     public final static String TABLE_NAME = "calendar_date_mapper";
     public final static String GTFS_ID = "gtfs_id";
     public final static String ID = "id";

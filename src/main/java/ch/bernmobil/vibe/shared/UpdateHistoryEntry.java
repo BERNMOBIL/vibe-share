@@ -2,6 +2,7 @@ package ch.bernmobil.vibe.shared;
 
 import java.sql.Timestamp;
 
+//TODO: REmove this. Keep only UpdateHistory Entitiy in the entitiy package
 public class UpdateHistoryEntry {
     private Timestamp time;
     private UpdateManager.Status status;

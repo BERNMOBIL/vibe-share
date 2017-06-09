@@ -1,6 +1,8 @@
 package ch.bernmobil.vibe.shared.contract;
 
 public final class RouteContract {
+    private RouteContract(){}
+
     public final static String TABLE_NAME = "route";
     public final static String ID = "id";
     public final static String TYPE = "type";
