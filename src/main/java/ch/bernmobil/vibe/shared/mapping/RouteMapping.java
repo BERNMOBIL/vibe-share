@@ -7,8 +7,8 @@ public class RouteMapping {
     private UUID id;
 
     public RouteMapping(String gtfsId, UUID id) {
-        setGtfsId(gtfsId);
-        setId(id);
+        this.gtfsId = gtfsId;
+        this.id = id;
     }
 
     public String getGtfsId() {

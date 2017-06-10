@@ -8,8 +8,8 @@ public class AreaMapping {
     private UUID id;
 
     public AreaMapping(String gtfsId, UUID id) {
-        setGtfsId(gtfsId);
-        setId(id);
+        this.gtfsId = gtfsId;
+        this.id = id;
     }
 
     public String getGtfsId() {
