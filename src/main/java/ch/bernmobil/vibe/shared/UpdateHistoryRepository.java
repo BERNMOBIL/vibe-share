@@ -19,7 +19,7 @@ import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
 
 /**
- * Database-Repository for accessing {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} information's.
+ * Database repository for accessing {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} information.
  *
  * @author Oliverio Chiodo
  * @author Matteo Patisso
@@ -27,6 +27,7 @@ import static org.jooq.impl.DSL.table;
 @Repository
 public class UpdateHistoryRepository {
     private final DSLContext dslContext;
+
 
     /**
      * Constructs an instance using a {@link DSLContext}
