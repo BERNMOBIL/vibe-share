@@ -25,13 +25,13 @@ public class ScheduleMockData {
         "Plattform 3",
     };
 
-    private static Time[] planned_arrivals = {
+    private static Time[] plannedArrivals = {
         Time.valueOf(LocalTime.parse("01:38:00")),
         Time.valueOf(LocalTime.parse("05:08:00")),
         Time.valueOf(LocalTime.parse("01:20:00")),
     };
 
-    private static Time[] planned_departures = {
+    private static Time[] plannedDepartures = {
         Time.valueOf(LocalTime.parse("01:38:00")),
         Time.valueOf(LocalTime.parse("05:08:00")),
         Time.valueOf(LocalTime.parse("01:20:00")),
@@ -55,7 +55,7 @@ public class ScheduleMockData {
             dataSource = new ArrayList<>();
             for(int i = 0; i < ids.length; i++) {
                 dataSource.add(
-                    new Schedule(ids[i], platforms[i], planned_arrivals[i], planned_departures[i],
+                    new Schedule(ids[i], platforms[i], plannedArrivals[i], plannedDepartures[i],
                         stops[i], journeys[i]));
             }
         }

@@ -33,14 +33,26 @@ import static jooq.generated.entities.static_.tables.Schedule.SCHEDULE;
 public class MockProvider implements MockDataProvider {
 
     private QueryCollector queryCollector;
-    public boolean actLikeUpdateHistoryIsEmpty;
-    public boolean actLikeUpdateHistoryhasValidCollision;
-    public boolean actLikeUpdateHistoryhasInvalidCollision;
+    private boolean actLikeUpdateHistoryIsEmpty;
+    private boolean actLikeUpdateHistoryhasValidCollision;
+    private boolean actLikeUpdateHistoryhasInvalidCollision;
 
     public void cleanFlags() {
         actLikeUpdateHistoryIsEmpty = false;
         actLikeUpdateHistoryhasValidCollision = false;
         actLikeUpdateHistoryhasInvalidCollision = false;
+    }
+
+    public void actLikeUpdateHistoryIsEmpty() {
+        this.actLikeUpdateHistoryIsEmpty = true;
+    }
+
+    public void actLikeUpdateHistoryhasValidCollision() {
+        this.actLikeUpdateHistoryhasValidCollision = true;
+    }
+
+    public void actLikeUpdateHistoryhasInvalidCollision() {
+        this.actLikeUpdateHistoryhasInvalidCollision = true;
     }
 
     @Override
@@ -60,13 +72,7 @@ public class MockProvider implements MockDataProvider {
                 List<Schedule> mockedSchedules = ScheduleMockData.getDataSource();
                 Result<ScheduleRecord> result = create.newResult(SCHEDULE);
                 for(Schedule mockSchedule : mockedSchedules) {
-                    ScheduleRecord record = create.newRecord(SCHEDULE);
-                    record.setValue(SCHEDULE.ID, mockSchedule.getId());
-                    record.setValue(SCHEDULE.JOURNEY, mockSchedule.getJourney());
-                    record.setValue(SCHEDULE.STOP, mockSchedule.getStop());
-                    record.setValue(SCHEDULE.PLATFORM, mockSchedule.getPlatform());
-                    record.setValue(SCHEDULE.PLANNED_ARRIVAL, mockSchedule.getPlannedArrival());
-                    record.setValue(SCHEDULE.PLANNED_DEPARTURE, mockSchedule.getPlannedDeparture());
+                    ScheduleRecord record = createScheduleRecord(create, mockSchedule);
                     result.add(record);
                 }
                 mock[0] = new MockResult(mockedSchedules.size(), result);
@@ -74,10 +80,7 @@ public class MockProvider implements MockDataProvider {
                 List<JourneyMapping> mockedJourneyMappings = JourneyMapperMockData.getDataSource();
                 Result<JourneyMapperRecord> result = create.newResult(JOURNEY_MAPPER);
                 for(JourneyMapping mockJourneyMapping : mockedJourneyMappings) {
-                    JourneyMapperRecord record = create.newRecord(JOURNEY_MAPPER);
-                    record.setValue(JOURNEY_MAPPER.ID, mockJourneyMapping.getId());
-                    record.setValue(JOURNEY_MAPPER.GTFS_SERVICE_ID, mockJourneyMapping.getGtfsServiceId());
-                    record.setValue(JOURNEY_MAPPER.GTFS_TRIP_ID, mockJourneyMapping.getGtfsTripId());
+                    JourneyMapperRecord record = createJourneyMapperRecord(create, mockJourneyMapping);
                     result.add(record);
                 }
                 mock[0] = new MockResult(mockedJourneyMappings.size(), result);
@@ -85,38 +88,18 @@ public class MockProvider implements MockDataProvider {
                 List<StopMapping> mockedStopMappings = StopMapperMockData.getDataSource();
                 Result<StopMapperRecord> result = create.newResult(STOP_MAPPER);
                 for(StopMapping mockStopMapping : mockedStopMappings) {
-                    StopMapperRecord record = create.newRecord(STOP_MAPPER);
-                    record.setValue(STOP_MAPPER.ID, mockStopMapping.getId());
-                    record.setValue(STOP_MAPPER.GTFS_ID, mockStopMapping.getGtfsId());
+                    StopMapperRecord record = createStopMapperRecord(create, mockStopMapping);
                     result.add(record);
                 }
                 mock[0] = new MockResult(mockedStopMappings.size(), result);
             } else if(sql.contains("FROM UPDATE_HISTORY") && !actLikeUpdateHistoryIsEmpty) {
-                List<UpdateHistory> mockedUpdateHistoryEntries;
+                List<UpdateHistory> mockedUpdateHistoryEntries = getUpdateHistoryEntries(sql, ctx);
 
-                if(actLikeUpdateHistoryhasValidCollision) {
-                    mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSourceWithValidUpdateCollision();
-                } else if(actLikeUpdateHistoryhasInvalidCollision) {
-                    mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSourceWithInvalidUpdateCollision();
-                } else {
-                    mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSource();
-                }
-                if(sql.contains("ORDER BY TIME DESC")) {
-                    mockedUpdateHistoryEntries = mockedUpdateHistoryEntries.stream()
-                        .sorted(Comparator.comparing(UpdateHistory::getTime)).collect(Collectors.toList());
-                    Collections.reverse(mockedUpdateHistoryEntries);
-                }
 
-                if(sql.contains("LIMIT ?")) {
-                    int numRecords = (int) ctx.bindings()[ctx.bindings().length-1];
-                    mockedUpdateHistoryEntries = mockedUpdateHistoryEntries.subList(0, numRecords);
-                }
 
                 Result<UpdateHistoryRecord> result = create.newResult(UPDATE_HISTORY);
                 for(UpdateHistory mockUpdateHistory : mockedUpdateHistoryEntries) {
-                    UpdateHistoryRecord record = create.newRecord(UPDATE_HISTORY);
-                    record.setValue(UPDATE_HISTORY.TIME, mockUpdateHistory.getTime());
-                    record.setValue(UPDATE_HISTORY.STATUS, mockUpdateHistory.getStatus().toString());
+                    UpdateHistoryRecord record = createUpdateHistoryRecord(create, mockUpdateHistory);
                     result.add(record);
                 }
                 mock[0] = new MockResult(mockedUpdateHistoryEntries.size(), result);
@@ -126,13 +109,77 @@ public class MockProvider implements MockDataProvider {
         return mock[0] != null ? mock : new MockResult[0];
     }
 
-    public void useQueryCollector(QueryCollector queryCollector) {
+    private List<UpdateHistory> getUpdateHistoryEntries(String sql, MockExecuteContext ctx) {
+        List<UpdateHistory> mockedUpdateHistoryEntries;
+        if(actLikeUpdateHistoryhasValidCollision) {
+            mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSourceWithValidUpdateCollision();
+        } else if(actLikeUpdateHistoryhasInvalidCollision) {
+            mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSourceWithInvalidUpdateCollision();
+        } else {
+            mockedUpdateHistoryEntries = UpdateHistoryMockData.getDataSource();
+        }
+
+        if(sql.contains("ORDER BY TIME DESC")) {
+            mockedUpdateHistoryEntries = mockedUpdateHistoryEntries.stream()
+                .sorted(Comparator.comparing(UpdateHistory::getTime)).collect(Collectors.toList());
+            Collections.reverse(mockedUpdateHistoryEntries);
+        }
+
+        if(sql.contains("LIMIT ?")) {
+            int numRecords = (int) ctx.bindings()[ctx.bindings().length-1];
+            mockedUpdateHistoryEntries = mockedUpdateHistoryEntries.subList(0, numRecords);
+        }
+        return mockedUpdateHistoryEntries;
+    }
+
+    private ScheduleRecord createScheduleRecord(DSLContext create, Schedule mockSchedule) {
+        ScheduleRecord record = create.newRecord(SCHEDULE);
+        record.setValue(SCHEDULE.ID, mockSchedule.getId());
+        record.setValue(SCHEDULE.JOURNEY, mockSchedule.getJourney());
+        record.setValue(SCHEDULE.STOP, mockSchedule.getStop());
+        record.setValue(SCHEDULE.PLATFORM, mockSchedule.getPlatform());
+        record.setValue(SCHEDULE.PLANNED_ARRIVAL, mockSchedule.getPlannedArrival());
+        record.setValue(SCHEDULE.PLANNED_DEPARTURE, mockSchedule.getPlannedDeparture());
+        return record;
+    }
+
+    private UpdateHistoryRecord createUpdateHistoryRecord(DSLContext create, UpdateHistory mockUpdateHistory) {
+        UpdateHistoryRecord record = create.newRecord(UPDATE_HISTORY);
+        record.setValue(UPDATE_HISTORY.TIME, mockUpdateHistory.getTime());
+        record.setValue(UPDATE_HISTORY.STATUS, mockUpdateHistory.getStatus().toString());
+        return record;
+    }
+
+    private StopMapperRecord createStopMapperRecord(DSLContext create, StopMapping mockStopMapping) {
+        StopMapperRecord record = create.newRecord(STOP_MAPPER);
+        record.setValue(STOP_MAPPER.ID, mockStopMapping.getId());
+        record.setValue(STOP_MAPPER.GTFS_ID, mockStopMapping.getGtfsId());
+        return record;
+    }
+
+    private JourneyMapperRecord createJourneyMapperRecord(DSLContext create, JourneyMapping mockJourneyMapping) {
+        JourneyMapperRecord record = create.newRecord(JOURNEY_MAPPER);
+        record.setValue(JOURNEY_MAPPER.ID, mockJourneyMapping.getId());
+        record.setValue(JOURNEY_MAPPER.GTFS_SERVICE_ID, mockJourneyMapping.getGtfsServiceId());
+        record.setValue(JOURNEY_MAPPER.GTFS_TRIP_ID, mockJourneyMapping.getGtfsTripId());
+        return record;
+    }
+
+    void useQueryCollector(QueryCollector queryCollector) {
         this.queryCollector = queryCollector;
     }
 
     static class QueryCollector {
-        public List<String> queries = new ArrayList<>();
-        public List<List<Object>> bindings = new ArrayList<>();
+        private List<String> queries = new ArrayList<>();
+        private List<List<Object>> bindings = new ArrayList<>();
+
+        List<String> getQueries() {
+            return queries;
+        }
+
+        List<List<Object>> getBindings() {
+            return bindings;
+        }
     }
 }
 

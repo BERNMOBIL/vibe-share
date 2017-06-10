@@ -16,14 +16,15 @@ public class TestHelper {
     }
 
     void assertBindings(Object[][] expectedBindings, long timestampDelta) {
-        Assert.assertEquals(expectedBindings.length, queryCollector.bindings.size());
+        Assert.assertEquals(expectedBindings.length, queryCollector.getBindings().size());
 
         for(int i = 0; i < expectedBindings.length; i++) {
             Object[] queryBindings = expectedBindings[i];
-            Assert.assertEquals(expectedBindings[i].length, queryCollector.bindings.get(i).size());
+            Assert.assertEquals(expectedBindings[i].length, queryCollector.getBindings().get(i).size());
             for(int j = 0; j < queryBindings.length; j++) {
                 if(queryBindings[j] instanceof Timestamp) {
-                    Assert.assertEquals(((Timestamp)expectedBindings[i][j]).getTime(),((Timestamp)queryCollector.bindings.get(i).get(j)).getTime(), timestampDelta);
+                    Assert.assertEquals(((Timestamp)expectedBindings[i][j]).getTime(),
+                            ((Timestamp)queryCollector.getBindings().get(i).get(j)).getTime(), timestampDelta);
                 } else {
                     Assert.assertEquals(expectedBindings[i][j], queryBindings[j]);
                 }
@@ -32,7 +33,8 @@ public class TestHelper {
     }
 
     void assertQueries(String[] expectedQueries) {
-        Assert.assertEquals(expectedQueries.length, queryCollector.queries.size());
-        Assert.assertArrayEquals(expectedQueries, queryCollector.queries.toArray(new String[queryCollector.queries.size()]));
+        Assert.assertEquals(expectedQueries.length, queryCollector.getQueries().size());
+        Assert.assertArrayEquals(expectedQueries,
+                queryCollector.getQueries().toArray(new String[queryCollector.getQueries().size()]));
     }
 }

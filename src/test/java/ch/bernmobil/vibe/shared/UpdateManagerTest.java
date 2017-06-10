@@ -162,7 +162,7 @@ public class UpdateManagerTest {
         final Object[][] expectedBindings = {
                 {1}
         };
-        mockProvider.actLikeUpdateHistoryhasValidCollision = true;
+        mockProvider.actLikeUpdateHistoryhasValidCollision();
         boolean result = updateManager.hasUpdateCollision();
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -205,7 +205,7 @@ public class UpdateManagerTest {
                 {expectedTimestamp},
                 {expectedTimestamp},
         };
-        mockProvider.actLikeUpdateHistoryhasInvalidCollision = true;
+        mockProvider.actLikeUpdateHistoryhasInvalidCollision();
         boolean result = updateManager.hasUpdateCollision();
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);

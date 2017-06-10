@@ -74,7 +74,7 @@ public class UpdateHistoryRepositoryTest {
         final Object[][] expectedBindings = {
             {Status.SUCCESS.toString(), 1}
         };
-        mockProvider.actLikeUpdateHistoryIsEmpty = true;
+        mockProvider.actLikeUpdateHistoryIsEmpty();
         UpdateHistory actualResult = updateHistoryRepository.findLastSuccessUpdate();
 
         testHelper.assertQueries(expectedQueries);
@@ -107,7 +107,7 @@ public class UpdateHistoryRepositoryTest {
         final Object[][] expectedBindings = {
             {1}
         };
-        mockProvider.actLikeUpdateHistoryIsEmpty = true;
+        mockProvider.actLikeUpdateHistoryIsEmpty();
         UpdateHistory actualResult = updateHistoryRepository.findLastUpdate();
 
         testHelper.assertQueries(expectedQueries);
@@ -149,7 +149,7 @@ public class UpdateHistoryRepositoryTest {
         };
         final int numUpdates = 2;
 
-        mockProvider.actLikeUpdateHistoryIsEmpty = true;
+        mockProvider.actLikeUpdateHistoryIsEmpty();
         List<UpdateHistory> actualResult = updateHistoryRepository.findLatestNSuccessfulUpdates(numUpdates);
 
         testHelper.assertQueries(expectedQueries);
@@ -191,7 +191,7 @@ public class UpdateHistoryRepositoryTest {
     }
 
     @Test
-    public void UpdateHistoryTest() {
+    public void updateHistoryTest() {
         Timestamp timestamp = Timestamp.valueOf("2017-06-04 15:48:05");
         final UpdateHistory updateHistory = new UpdateHistory(timestamp, UpdateManager.Status.IN_PROGRESS);
         final String[] expectedQueries = {

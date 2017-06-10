@@ -1,12 +1,8 @@
 package ch.bernmobil.vibe.shared.mockdata;
 
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
 
 public class JourneyMapperMockData {
     private static List<JourneyMapping> dataSource;

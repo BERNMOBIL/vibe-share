@@ -64,7 +64,7 @@ public class UpdateManagerRepositoryTest {
 
     @Test
     public void deleteInvalidUpdatesInMultipleTablesAndTimestampsTest() {
-        final String expectedQueries[] = {
+        final String[] expectedQueries = {
                 "DELETE FROM SCHEDULE WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))",
                 "DELETE FROM SCHEDULE_UPDATE WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))",
                 "DELETE FROM JOURNEY WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))"

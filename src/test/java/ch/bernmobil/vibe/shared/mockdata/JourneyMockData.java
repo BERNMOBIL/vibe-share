@@ -26,7 +26,7 @@ public class JourneyMockData {
         UUID.fromString("9ede091b-5edd-46d5-8a1a-b2f96f0b43d6"),
     };
 
-    private static UUID[] terminal_stations = {
+    private static UUID[] terminalStations = {
         UUID.fromString("a705c8d2-7089-458f-b68d-469ba6ac90d6"),
         UUID.fromString("2456efe9-4dd2-4929-9add-a108cd6a66ff"),
         UUID.fromString("cc8a03cc-1648-425e-9e4d-48540964bd91")
@@ -38,7 +38,7 @@ public class JourneyMockData {
         if(dataSource == null) {
             dataSource = new ArrayList<>();
             for(int i = 0; i < ids.length; i++) {
-                dataSource.add(new Journey(ids[i], headsigns[i], routes[i], terminal_stations[i]));
+                dataSource.add(new Journey(ids[i], headsigns[i], routes[i], terminalStations[i]));
             }
         }
 

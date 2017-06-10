@@ -1,12 +1,8 @@
 package ch.bernmobil.vibe.shared.mockdata;
 
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
 
 public class StopMapperMockData {
     private static List<StopMapping> dataSource;
