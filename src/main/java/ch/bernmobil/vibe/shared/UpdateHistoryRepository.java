@@ -28,20 +28,19 @@ import static org.jooq.impl.DSL.table;
 public class UpdateHistoryRepository {
     private final DSLContext dslContext;
 
-    private UpdateHistory recordOrNull(Record record) {
-        if(record != null) {
-            return record.into(UpdateHistory.class);
-        }
-        return null;
-    }
-
-
     /**
      * Constructs an instance using a {@link DSLContext}
      * @param dslContext Object of the JOOQ Query Builder to access the database
      */
     public UpdateHistoryRepository(DSLContext dslContext) {
         this.dslContext = dslContext;
+    }
+
+    private UpdateHistory recordOrNull(Record record) {
+        if(record != null) {
+            return record.into(UpdateHistory.class);
+        }
+        return null;
     }
 
     /**

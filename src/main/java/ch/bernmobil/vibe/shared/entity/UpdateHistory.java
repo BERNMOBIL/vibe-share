@@ -13,8 +13,9 @@ public class UpdateHistory {
         this.status = status;
     }
 
-    //Empty Constructor needed for because of the JOOQ-Conversion
-    public UpdateHistory() {}
+    public UpdateHistory() {
+        //Empty Constructor needed for because of the JOOQ-Conversion
+    }
 
     public Timestamp getTime() {
         return time;

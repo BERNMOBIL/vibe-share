@@ -166,9 +166,9 @@ public class UpdateHistoryRepositoryTest {
         final Object[][] expectedBindings = {
             {timestamp, Status.SUCCESS.toString()}
         };
-        final UpdateHistory UpdateHistory = new UpdateHistory(timestamp, UpdateManager.Status.SUCCESS);
+        final UpdateHistory updateHistory = new UpdateHistory(timestamp, UpdateManager.Status.SUCCESS);
 
-        updateHistoryRepository.insert(UpdateHistory);
+        updateHistoryRepository.insert(updateHistory);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -176,7 +176,7 @@ public class UpdateHistoryRepositoryTest {
     @Test
     public void insertValidInProgressUpdateHistoryTest() {
         final Timestamp timestamp = Timestamp.valueOf("2017-06-04 15:48:05");
-        final UpdateHistory UpdateHistory = new UpdateHistory(timestamp, UpdateManager.Status.IN_PROGRESS);
+        final UpdateHistory updateHistory = new UpdateHistory(timestamp, UpdateManager.Status.IN_PROGRESS);
         final String[] expectedQueries = {
             "INSERT INTO UPDATE_HISTORY (TIME, STATUS) VALUES (CAST(? AS TIMESTAMP), ?)"
         };
@@ -184,7 +184,7 @@ public class UpdateHistoryRepositoryTest {
             {timestamp, Status.SUCCESS.toString()}
         };
 
-        updateHistoryRepository.insert(UpdateHistory);
+        updateHistoryRepository.insert(updateHistory);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -193,7 +193,7 @@ public class UpdateHistoryRepositoryTest {
     @Test
     public void UpdateHistoryTest() {
         Timestamp timestamp = Timestamp.valueOf("2017-06-04 15:48:05");
-        final UpdateHistory UpdateHistory = new UpdateHistory(timestamp, UpdateManager.Status.IN_PROGRESS);
+        final UpdateHistory updateHistory = new UpdateHistory(timestamp, UpdateManager.Status.IN_PROGRESS);
         final String[] expectedQueries = {
             "UPDATE UPDATE_HISTORY SET STATUS = ? WHERE TIME = CAST(? AS TIMESTAMP)"
         };
@@ -201,7 +201,7 @@ public class UpdateHistoryRepositoryTest {
             {Status.IN_PROGRESS.toString(), timestamp}
         };
 
-        updateHistoryRepository.update(UpdateHistory);
+        updateHistoryRepository.update(updateHistory);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);

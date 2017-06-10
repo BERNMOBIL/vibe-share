@@ -32,6 +32,7 @@ public class JourneyMockData {
         UUID.fromString("cc8a03cc-1648-425e-9e4d-48540964bd91")
     };
 
+    private JourneyMockData () {}
 
     public static List<Journey> getDataSource() {
         if(dataSource == null) {

@@ -6,6 +6,7 @@ package ch.bernmobil.vibe.shared.contract;
  * @author Oliviero Chiodo
  * @author Matteo Patisso
  */
+@SuppressWarnings("ALL")
 public final class AreaContract {
 
     public static final String TABLE_NAME = "area";

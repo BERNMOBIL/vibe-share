@@ -6,6 +6,7 @@ package ch.bernmobil.vibe.shared.contract;
  * @author Oliviero Chiodo
  * @author Matteo Patisso
  */
+@SuppressWarnings("ALL")
 public final class ScheduleUpdateContract {
     public static final String TABLE_NAME = "schedule_update";
     public static final String ID = "id";

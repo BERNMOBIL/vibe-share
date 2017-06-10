@@ -1,8 +1,8 @@
 package ch.bernmobil.vibe.shared;
 
-import java.sql.Timestamp;
 import org.junit.Assert;
-import org.junit.Before;
+
+import java.sql.Timestamp;
 
 public class TestHelper {
 

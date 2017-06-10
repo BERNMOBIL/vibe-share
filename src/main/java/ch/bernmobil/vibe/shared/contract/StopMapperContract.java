@@ -6,6 +6,7 @@ package ch.bernmobil.vibe.shared.contract;
  * @author Oliviero Chiodo
  * @author Matteo Patisso
  */
+@SuppressWarnings("ALL")
 public final class StopMapperContract {
     public static final String TABLE_NAME = "stop_mapper";
     public static final String GTFS_ID = "gtfs_id";

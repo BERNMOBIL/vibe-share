@@ -23,6 +23,8 @@ public class UpdateHistoryMockData {
         Status.SUCCESS,
     };
 
+    private UpdateHistoryMockData() {}
+
     public static List<UpdateHistory> getDataSource() {
         if(dataSource == null) {
             dataSource = new ArrayList<>();

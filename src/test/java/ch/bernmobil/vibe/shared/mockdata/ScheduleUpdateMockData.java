@@ -35,6 +35,7 @@ public class ScheduleUpdateMockData {
         Time.valueOf(LocalTime.parse("16:07:00")),
     };
 
+    private ScheduleUpdateMockData() {}
 
     public static List<ScheduleUpdate> getDataSource() {
         if(dataSource == null) {

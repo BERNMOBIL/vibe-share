@@ -38,7 +38,7 @@ public class UpdateManager {
             JourneyMapperContract.TABLE_NAME,
             RouteMapperContract.TABLE_NAME,
             StopMapperContract.TABLE_NAME};
-    private static final String updateTimestampColumn = "update";
+    private static final String UPDATE_TIMESTAMP_COLUMN = "update";
     private final int updateHistoryLength;
     private final long updateTimeoutThresholdInMilliseconds;
     private final UpdateHistoryRepository updateHistoryRepository;
@@ -107,8 +107,8 @@ public class UpdateManager {
     public void repairFailedUpdate() {
         if(updateTimestampManager.getActiveUpdateTimestamp() != null) {
             Timestamp failedUpdateTimestamp = updateTimestampManager.getActiveUpdateTimestamp();
-            staticRepository.deleteByUpdateTimestamp(TABLES_TO_DELETE, failedUpdateTimestamp, updateTimestampColumn);
-            mapperRepository.deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, failedUpdateTimestamp, updateTimestampColumn);
+            staticRepository.deleteByUpdateTimestamp(TABLES_TO_DELETE, failedUpdateTimestamp, UPDATE_TIMESTAMP_COLUMN);
+            mapperRepository.deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, failedUpdateTimestamp, UPDATE_TIMESTAMP_COLUMN);
         }
     }
 
@@ -125,8 +125,8 @@ public class UpdateManager {
             if(timeDiff > updateTimeoutThresholdInMilliseconds) {
                 lastUpdate.setStatus(Status.FAILED);
                 updateHistoryRepository.update(lastUpdate);
-                staticRepository.deleteByUpdateTimestamp(TABLES_TO_DELETE, lastUpdate.getTime(), updateTimestampColumn);
-                mapperRepository.deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, lastUpdate.getTime(), updateTimestampColumn);
+                staticRepository.deleteByUpdateTimestamp(TABLES_TO_DELETE, lastUpdate.getTime(), UPDATE_TIMESTAMP_COLUMN);
+                mapperRepository.deleteByUpdateTimestamp(MAPPING_TABLES_TO_DELETE, lastUpdate.getTime(), UPDATE_TIMESTAMP_COLUMN);
                 return false;
             }
             return true;

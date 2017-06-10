@@ -6,6 +6,7 @@ package ch.bernmobil.vibe.shared.contract;
  * @author Oliviero Chiodo
  * @author Matteo Patisso
  */
+@SuppressWarnings("ALL")
 public final class CalendarDateMapperContract {
     public static final String TABLE_NAME = "calendar_date_mapper";
     public static final String GTFS_ID = "gtfs_id";

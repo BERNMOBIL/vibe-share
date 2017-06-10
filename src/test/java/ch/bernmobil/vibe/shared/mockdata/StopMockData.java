@@ -26,6 +26,7 @@ public class StopMockData {
         UUID.fromString("0ca7771d-1f23-42c8-8d39-914b193f945c")
     };
 
+    private StopMockData() {}
 
     public static List<Stop> getDataSource() {
         if(dataSource == null) {

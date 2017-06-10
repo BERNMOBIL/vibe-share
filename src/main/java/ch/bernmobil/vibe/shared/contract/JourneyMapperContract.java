@@ -6,6 +6,7 @@ package ch.bernmobil.vibe.shared.contract;
  * @author Oliviero Chiodo
  * @author Matteo Patisso
  */
+@SuppressWarnings("ALL")
 public final class JourneyMapperContract {
     public static final String TABLE_NAME = "journey_mapper";
     public static final String GTFS_TRIP_ID = "gtfs_trip_id";

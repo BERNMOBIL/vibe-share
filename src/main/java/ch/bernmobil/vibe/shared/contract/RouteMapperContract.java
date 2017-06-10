@@ -6,6 +6,7 @@ package ch.bernmobil.vibe.shared.contract;
  * @author Oliviero Chiodo
  * @author Matteo Patisso
  */
+@SuppressWarnings("ALL")
 public final class RouteMapperContract {
     public static final String TABLE_NAME = "route_mapper";
     public static final String GTFS_ID = "gtfs_id";

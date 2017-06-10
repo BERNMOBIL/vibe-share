@@ -6,6 +6,7 @@ package ch.bernmobil.vibe.shared.contract;
  * @author Oliviero Chiodo
  * @author Matteo Patisso
  */
+@SuppressWarnings("ALL")
 public final class UpdateHistoryContract {
     public static final String TABLE_NAME = "update_history";
     public static final String TIME = "time";

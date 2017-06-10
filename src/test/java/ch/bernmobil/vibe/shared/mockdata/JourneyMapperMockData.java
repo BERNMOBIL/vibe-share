@@ -30,12 +30,7 @@ public class JourneyMapperMockData {
         "338",
     };
 
-    private static Timestamp[] updates = {
-        new Timestamp(0),
-        new Timestamp(0),
-        new Timestamp(0),
-    };
-
+    private  JourneyMapperMockData() {}
 
     public static List<JourneyMapping> getDataSource() {
         if(dataSource == null) {

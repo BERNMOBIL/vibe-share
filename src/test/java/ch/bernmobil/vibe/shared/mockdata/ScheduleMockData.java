@@ -48,6 +48,8 @@ public class ScheduleMockData {
         JourneyMockData.getDataSource().get(2).getId(),
     };
 
+    private ScheduleMockData() {}
+
     public static List<Schedule> getDataSource() {
         if(dataSource == null) {
             dataSource = new ArrayList<>();

@@ -24,12 +24,7 @@ public class StopMapperMockData {
         "88423_0"
     };
 
-    private static Timestamp[] updates = {
-        new Timestamp(0),
-        new Timestamp(0),
-        new Timestamp(0),
-    };
-
+    private StopMapperMockData() {}
 
     public static List<StopMapping> getDataSource() {
         if(dataSource == null) {
