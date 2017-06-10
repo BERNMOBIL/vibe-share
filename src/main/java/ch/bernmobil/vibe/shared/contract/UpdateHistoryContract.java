@@ -1,7 +1,7 @@
 package ch.bernmobil.vibe.shared.contract;
 
 /**
- * Database contract to define table name and column name for {@link ch.bernmobil.vibe.shared.UpdateHistoryEntry}.
+ * Database contract to define table name and column name for {@link ch.bernmobil.vibe.shared.entity.UpdateHistory}.
  *
  * @author Oliviero Chiodo
  * @author Matteo Patisso

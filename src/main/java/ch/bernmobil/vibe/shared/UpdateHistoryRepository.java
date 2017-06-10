@@ -45,8 +45,8 @@ public class UpdateHistoryRepository {
 
     /**
      * Fetch one row of the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory}-table with the given timestamp
-     * @param timestamp search-criteria
-     * @return
+     * @param timestamp search-criteria.
+     * @return {@link UpdateHistory} entry with the given timestamp.
      */
     public UpdateHistory findByTimestamp(Timestamp timestamp) {
         Record record =  dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
@@ -58,8 +58,8 @@ public class UpdateHistoryRepository {
     }
 
     /**
-     * Fetch the newest row of the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory}-table with the status {@link UpdateManager.Status#SUCCESS}
-     * @return
+     * Fetch the newest row of the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} table with the status {@link UpdateManager.Status#SUCCESS}
+     * @return Latest {@link UpdateHistory} entry which is marked as {@link Status#SUCCESS}.
      */
     public UpdateHistory findLastSuccessUpdate() {
         Record record = dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
@@ -72,8 +72,8 @@ public class UpdateHistoryRepository {
     }
 
     /**
-     * Fetch the newest row of the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory}-table
-     * @return
+     * Fetch the newest row of the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} table
+     * @return Latest {@link UpdateHistory} entry.
      */
     public UpdateHistory findLastUpdate() {
         Record record = dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
@@ -86,21 +86,21 @@ public class UpdateHistoryRepository {
 
     /**
      * Fetch a number of newest row of the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory}-table with the Status {@link Status#SUCCESS}
-     * @param num
-     * @return
+     * @param amount of rows which will be returned maximum.
+     * @return List {@link UpdateHistory} which were {@link Status#SUCCESS}.
      */
-    public List<UpdateHistory> findLatestNSuccessfulUpdates(int num) {
+    public List<UpdateHistory> findLatestNSuccessfulUpdates(int amount) {
         return dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
                 .where(field(UpdateHistoryContract.STATUS).eq(Status.SUCCESS.toString()))
                 .orderBy(field(UpdateHistoryContract.TIME).desc())
-                .limit(num)
+                .limit(amount)
                 .fetch()
                 .into(UpdateHistory.class);
     }
 
     /**
      * Saves an {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} entity in the database
-     * @param updateHistoryEntry
+     * @param updateHistoryEntry to be inserted.
      */
     public void insert(UpdateHistory updateHistoryEntry) {
         Collection<Field<?>> fields = Arrays.stream(UpdateHistoryContract.COLUMNS)
@@ -114,7 +114,7 @@ public class UpdateHistoryRepository {
     /**
      * Updates an {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} entity in the database
      * <p>Notice: The {@link ch.bernmobil.vibe.shared.entity.UpdateHistory#time} attribute acts as primary key and identifies the entity to change</p>
-     * @param element
+     * @param element to be updated.
      */
     public void update(UpdateHistory element) {
         dslContext.update(table(UpdateHistoryContract.TABLE_NAME))
@@ -126,7 +126,7 @@ public class UpdateHistoryRepository {
     /**
      * Counts the number of rows in the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} table in the database.
      * <p>Notice: This number is useful for the two-phase-locking used to synchronize multiple importer-instances</p>
-     * @return
+     * @return Number of rows.
      */
     public int count() {
         return dslContext.selectCount()
