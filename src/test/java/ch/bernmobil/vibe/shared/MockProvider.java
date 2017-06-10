@@ -129,9 +129,10 @@ public class MockProvider implements MockDataProvider {
     public void useQueryCollector(QueryCollector queryCollector) {
         this.queryCollector = queryCollector;
     }
+
+    static class QueryCollector {
+        public List<String> queries = new ArrayList<>();
+        public List<List<Object>> bindings = new ArrayList<>();
+    }
 }
 
-class QueryCollector {
-    public List<String> queries = new ArrayList<>();
-    public List<List<Object>> bindings = new ArrayList<>();
-}

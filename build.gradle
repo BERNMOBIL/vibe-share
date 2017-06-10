@@ -20,6 +20,19 @@ apply plugin: 'org.springframework.boot'
 
 sourceCompatibility = 1.8
 
+configurations {
+    testOutput
+}
+
+task jarTest (type: Jar, dependsOn: testClasses) {
+    from sourceSets.test.output
+    classifier = 'test'
+}
+
+artifacts {
+    testOutput jarTest
+}
+
 repositories {
     mavenCentral()
 }

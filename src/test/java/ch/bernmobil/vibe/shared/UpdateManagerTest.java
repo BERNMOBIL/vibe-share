@@ -16,14 +16,14 @@ import java.sql.Timestamp;
 @ActiveProfiles("testConfiguration")
 public class UpdateManagerTest {
     private MockProvider mockProvider;
-    private QueryCollector queryCollector;
+    private MockProvider.QueryCollector queryCollector;
     private UpdateManager updateManager;
     private UpdateTimestampManager updateTimestampManager;
     private TestHelper testHelper;
 
     @Before
     public void beforeTest() {
-        queryCollector = new QueryCollector();
+        queryCollector = new MockProvider.QueryCollector();
         mockProvider.useQueryCollector(queryCollector);
         mockProvider.cleanFlags();
         testHelper = new TestHelper(queryCollector);

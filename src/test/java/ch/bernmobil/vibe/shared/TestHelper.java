@@ -6,9 +6,9 @@ import org.junit.Before;
 
 public class TestHelper {
 
-    private final QueryCollector queryCollector;
+    private final MockProvider.QueryCollector queryCollector;
 
-    public TestHelper(QueryCollector queryCollector) {
+    public TestHelper(MockProvider.QueryCollector queryCollector) {
         this.queryCollector = queryCollector;
     }
 

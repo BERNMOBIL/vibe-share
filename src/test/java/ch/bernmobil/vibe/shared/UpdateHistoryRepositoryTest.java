@@ -20,12 +20,12 @@ import java.util.List;
 public class UpdateHistoryRepositoryTest {
     private UpdateHistoryRepository updateHistoryRepository;
     private MockProvider mockProvider;
-    private QueryCollector queryCollector;
+    private MockProvider.QueryCollector queryCollector;
     private TestHelper testHelper;
 
     @Before
     public void beforeTest() {
-        queryCollector = new QueryCollector();
+        queryCollector = new MockProvider.QueryCollector();
         mockProvider.useQueryCollector(queryCollector);
         mockProvider.cleanFlags();
         testHelper = new TestHelper(queryCollector);
