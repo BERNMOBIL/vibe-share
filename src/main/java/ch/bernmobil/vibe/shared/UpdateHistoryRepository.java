@@ -1,6 +1,7 @@
 package ch.bernmobil.vibe.shared;
 
 import ch.bernmobil.vibe.shared.contract.UpdateHistoryContract;
+import ch.bernmobil.vibe.shared.entity.UpdateHistory;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
@@ -17,50 +18,91 @@ import static ch.bernmobil.vibe.shared.UpdateManager.Status;
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
 
+/**
+ * Database-Repository for accessing {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} information's.
+ *
+ * @author Oliverio Chiodo
+ * @author Matteo Patisso
+ */
 @Repository
 public class UpdateHistoryRepository {
     private final DSLContext dslContext;
 
-    public UpdateHistoryRepository(DSLContext dslContext) {
-        this.dslContext = dslContext;
-    }
-
-    public UpdateHistoryEntry findByTimestamp(Timestamp timestamp) {
-        return dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
-                .where(field(UpdateHistoryContract.TIME).equal(timestamp))
-                .limit(1)
-                .fetchOne()
-                .into(UpdateHistoryEntry.class);
-    }
-
-    public UpdateHistoryEntry findLastSuccessUpdate() {
-        return dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
-                .where(field(UpdateHistoryContract.STATUS).eq(Status.SUCCESS.toString()))
-                .orderBy(field(UpdateHistoryContract.TIME).desc())
-                .limit(1)
-                .fetchOne()
-                .into(UpdateHistoryEntry.class);
-    }
-
-    public UpdateHistoryEntry findLastUpdate() {
-        Record record = dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
-                .orderBy(field(UpdateHistoryContract.TIME).desc())
-                .limit(1)
-                .fetchAny();
+    private UpdateHistoryEntry recordOrNull(Record record) {
         if(record != null) {
             return record.into(UpdateHistoryEntry.class);
         }
         return null;
     }
 
-    public List<UpdateHistoryEntry> findLatestNUpdates(int num) {
+
+    /**
+     * Constructs an instance using a {@link DSLContext}
+     * @param dslContext Object of the JOOQ Query Builder to access the database
+     */
+    public UpdateHistoryRepository(DSLContext dslContext) {
+        this.dslContext = dslContext;
+    }
+
+    /**
+     * Fetch one row of the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory}-table with the given timestamp
+     * @param timestamp search-criteria
+     * @return
+     */
+    public UpdateHistoryEntry findByTimestamp(Timestamp timestamp) {
+        Record record =  dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
+                .where(field(UpdateHistoryContract.TIME).equal(timestamp))
+                .limit(1)
+                .fetchAny();
+
+        return recordOrNull(record);
+    }
+
+    /**
+     * Fetch the newest row of the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory}-table with the status {@link UpdateManager.Status#SUCCESS}
+     * @return
+     */
+    public UpdateHistoryEntry findLastSuccessUpdate() {
+        Record record = dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
+                .where(field(UpdateHistoryContract.STATUS).eq(Status.SUCCESS.toString()))
+                .orderBy(field(UpdateHistoryContract.TIME).desc())
+                .limit(1)
+                .fetchAny();
+
+        return recordOrNull(record);
+    }
+
+    /**
+     * Fetch the newest row of the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory}-table
+     * @return
+     */
+    public UpdateHistoryEntry findLastUpdate() {
+        Record record = dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
+                .orderBy(field(UpdateHistoryContract.TIME).desc())
+                .limit(1)
+                .fetchAny();
+
+        return recordOrNull(record);
+    }
+
+    /**
+     * Fetch a number of newest row of the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory}-table with the Status {@link Status#SUCCESS}
+     * @param num
+     * @return
+     */
+    public List<UpdateHistoryEntry> findLatestNSuccessfulUpdates(int num) {
         return dslContext.selectFrom(table(UpdateHistoryContract.TABLE_NAME))
+                .where(field(UpdateHistoryContract.STATUS).eq(Status.SUCCESS.toString()))
                 .orderBy(field(UpdateHistoryContract.TIME).desc())
                 .limit(num)
                 .fetch()
                 .into(UpdateHistoryEntry.class);
     }
 
+    /**
+     * Saves an {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} entity in the database
+     * @param updateHistoryEntry
+     */
     public void insert(UpdateHistoryEntry updateHistoryEntry) {
         Collection<Field<?>> fields = Arrays.stream(UpdateHistoryContract.COLUMNS)
                 .map(DSL::field)
@@ -70,6 +112,11 @@ public class UpdateHistoryRepository {
                 .execute();
     }
 
+    /**
+     * Updates an {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} entity in the database
+     * <p>Notice: The {@link ch.bernmobil.vibe.shared.entity.UpdateHistory#time} attribute acts as primary key and identifies the entity to change</p>
+     * @param element
+     */
     public void update(UpdateHistoryEntry element) {
         dslContext.update(table(UpdateHistoryContract.TABLE_NAME))
                 .set(field(UpdateHistoryContract.STATUS), element.getStatus().toString())
@@ -77,6 +124,11 @@ public class UpdateHistoryRepository {
                 .execute();
     }
 
+    /**
+     * Counts the number of rows in the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} table in the database.
+     * <p>Notice: This number is useful for the two-phase-locking used to synchronize multiple importer-instances</p>
+     * @return
+     */
     public int count() {
         return dslContext.selectCount()
                 .from(table(UpdateHistoryContract.TABLE_NAME))

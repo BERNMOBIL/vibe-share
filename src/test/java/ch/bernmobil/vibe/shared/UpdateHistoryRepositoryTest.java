@@ -11,7 +11,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -67,6 +66,22 @@ public class UpdateHistoryRepositoryTest {
     }
 
     @Test
+    public void findLastSuccessUpdateHistoryEntryWithEmptyDatabaseTest() {
+        final String[] expectedQueries = {
+            "SELECT * FROM UPDATE_HISTORY WHERE STATUS = ? ORDER BY TIME DESC LIMIT ?"
+        };
+        final Object[][] expectedBindings = {
+            {Status.SUCCESS.toString(), 1}
+        };
+        mockProvider.actLikeUpdateHistoryIsEmpty = true;
+        UpdateHistoryEntry actualResult = updateHistoryRepository.findLastSuccessUpdate();
+
+        testHelper.assertQueries(expectedQueries);
+        testHelper.assertBindings(expectedBindings);
+        Assert.assertNull(actualResult);
+    }
+
+    @Test
     public void findLastUpdate() {
         final String[] expectedQueries = {
             "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?"
@@ -82,6 +97,7 @@ public class UpdateHistoryRepositoryTest {
         Assert.assertEquals(expectedResult.getStatus(), actualResult.getStatus());
         Assert.assertEquals(expectedResult.getTime(), actualResult.getTime());
     }
+
     @Test
     public void findLastWithEmptyDatabaseUpdate() {
         final String[] expectedQueries = {
@@ -99,12 +115,12 @@ public class UpdateHistoryRepositoryTest {
     }
 
     @Test
-    public void findLatestNUpdates() {
+    public void findLatestNSuccessfulUpdates() {
         final String[] expectedQueries = {
-            "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?"
+                "SELECT * FROM UPDATE_HISTORY WHERE STATUS = ? ORDER BY TIME DESC LIMIT ?"
         };
         final Object[][] expectedBindings = {
-            {1}
+            {"SUCCESS", 1}
         };
         final int numUpdates = 2;
         final UpdateHistoryEntry[] expectedResult = {
@@ -112,7 +128,7 @@ public class UpdateHistoryRepositoryTest {
                 new UpdateHistoryEntry(Timestamp.valueOf("2017-06-03 15:48:05"), UpdateManager.Status.IN_PROGRESS),
         };
 
-        List<UpdateHistoryEntry> actualResult = updateHistoryRepository.findLatestNUpdates(numUpdates);
+        List<UpdateHistoryEntry> actualResult = updateHistoryRepository.findLatestNSuccessfulUpdates(numUpdates);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -121,18 +137,19 @@ public class UpdateHistoryRepositoryTest {
         Assert.assertEquals(expectedResult[1].getTime(), actualResult.get(1).getTime());
         Assert.assertEquals(expectedResult[1].getStatus(), actualResult.get(1).getStatus());
     }
+
     @Test
     public void findLatestNUpdatesWithEmtpyDatabase() {
         final String[] expectedQueries = {
-            "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?"
+            "SELECT * FROM UPDATE_HISTORY WHERE STATUS = ? ORDER BY TIME DESC LIMIT ?"
         };
         final Object[][] expectedBindings = {
-            {1}
+            {"SUCCESS", 1}
         };
         final int numUpdates = 2;
 
         mockProvider.actLikeUpdateHistoryIsEmpty = true;
-        List<UpdateHistoryEntry> actualResult = updateHistoryRepository.findLatestNUpdates(numUpdates);
+        List<UpdateHistoryEntry> actualResult = updateHistoryRepository.findLatestNSuccessfulUpdates(numUpdates);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -188,7 +205,6 @@ public class UpdateHistoryRepositoryTest {
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
     }
-
 
     @Autowired
     private void setUpdateHistoryRepository(UpdateHistoryRepository updateHistoryRepository) {

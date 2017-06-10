@@ -35,7 +35,7 @@ public class UpdateManagerRepositoryTest {
     }
 
     @Test
-    public void prepareUpdateTest() {
+    public void truncateTest() {
         final String[] expectedQueries = {
             "TRUNCATE TABLE SCHEDULE_UPDATE"
         };
@@ -69,7 +69,7 @@ public class UpdateManagerRepositoryTest {
     }
 
     @Test
-    public void deleteInvalidUpdatesByMultipleTablesTest() {
+    public void deleteInvalidUpdatesInMultipleTablesAndTimestampsTest() {
         final String expectedQueries[] = {
                 "DELETE FROM SCHEDULE WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))",
                 "DELETE FROM SCHEDULE_UPDATE WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))",
@@ -125,7 +125,7 @@ public class UpdateManagerRepositoryTest {
             {timestamp}
         };
 
-        updateManagerRepository.deleteByUpdateTimestamp(tableNames, timestamp);
+        updateManagerRepository.deleteByUpdateTimestamp(tableNames, timestamp, "update");
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);

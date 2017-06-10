@@ -30,7 +30,7 @@ public class UpdateManagerTest {
     }
 
     @Test
-    public void findUpdateHistoryEntryByTimestampTest() {
+    public void prepareUpdateTest() {
         final Timestamp expectedTimestamp = new Timestamp(System.currentTimeMillis());
         final String[] expectedQueries = {
             "INSERT INTO UPDATE_HISTORY (TIME, STATUS) VALUES (CAST(? AS TIMESTAMP), ?)"
@@ -59,7 +59,7 @@ public class UpdateManagerTest {
     public void cleanOldDataTest() {
         final Timestamp[] validTimestamps = { Timestamp.valueOf("2017-06-04 15:48:05.0"), Timestamp.valueOf("2017-06-03 15:48:05.0")};
         final String[] expectedQueries =  {
-                "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?",
+                "SELECT * FROM UPDATE_HISTORY WHERE STATUS = ? ORDER BY TIME DESC LIMIT ?",
                 "TRUNCATE TABLE SCHEDULE_UPDATE",
                 "DELETE FROM SCHEDULE WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))",
                 "DELETE FROM CALENDAR_DATE WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))",
@@ -75,7 +75,7 @@ public class UpdateManagerTest {
                 "DELETE FROM STOP_MAPPER WHERE (UPDATE <> CAST(? AS TIMESTAMP) AND UPDATE <> CAST(? AS TIMESTAMP))",
         };
         final Object[][] expectedBindings = {
-                {2},
+                {"SUCCESS", 2},
                 {},
                 {validTimestamps, validTimestamps},
                 {validTimestamps, validTimestamps},
@@ -250,6 +250,7 @@ public class UpdateManagerTest {
     private void setUpdateManager(UpdateManager updateManager) {
         this.updateManager = updateManager;
     }
+
     @Autowired
     private void setMockProvider(MockProvider mockProvider) {
         this.mockProvider = mockProvider;
