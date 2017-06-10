@@ -19,6 +19,7 @@ import jooq.generated.entities.static_.tables.records.CalendarExceptionRecord;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -39,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CalendarException extends TableImpl<CalendarExceptionRecord> {
 
-    private static final long serialVersionUID = -44733206;
+    private static final long serialVersionUID = 742960470;
 
     /**
      * The reference instance of <code>public.calendar_exception</code>
@@ -57,7 +58,7 @@ public class CalendarException extends TableImpl<CalendarExceptionRecord> {
     /**
      * The column <code>public.calendar_exception.id</code>.
      */
-    public final TableField<CalendarExceptionRecord, UUID> ID = createField("id", org.jooq.impl.SQLDataType.UUID.nullable(false), this, "");
+    public final TableField<CalendarExceptionRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('calendar_exception_id_seq'::regclass)", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
      * The column <code>public.calendar_exception.date</code>.
@@ -107,6 +108,14 @@ public class CalendarException extends TableImpl<CalendarExceptionRecord> {
     @Override
     public Schema getSchema() {
         return Public.PUBLIC;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Identity<CalendarExceptionRecord, Integer> getIdentity() {
+        return Keys.IDENTITY_CALENDAR_EXCEPTION;
     }
 
     /**

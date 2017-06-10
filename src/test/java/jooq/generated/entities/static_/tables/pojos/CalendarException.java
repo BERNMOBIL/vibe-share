@@ -26,9 +26,9 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CalendarException implements Serializable {
 
-    private static final long serialVersionUID = -531600565;
+    private static final long serialVersionUID = -610013596;
 
-    private final UUID       id;
+    private final Integer    id;
     private final Date       date;
     private final BigDecimal type;
     private final UUID       calendarDate;
@@ -43,7 +43,7 @@ public class CalendarException implements Serializable {
     }
 
     public CalendarException(
-        UUID       id,
+        Integer    id,
         Date       date,
         BigDecimal type,
         UUID       calendarDate,
@@ -56,7 +56,7 @@ public class CalendarException implements Serializable {
         this.update = update;
     }
 
-    public UUID getId() {
+    public Integer getId() {
         return this.id;
     }
 

@@ -28,6 +28,7 @@ import jooq.generated.entities.static_.tables.records.StopRecord;
 import jooq.generated.entities.static_.tables.records.UpdateHistoryRecord;
 
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.AbstractKeys;
 
@@ -50,6 +51,8 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
+    public static final Identity<CalendarExceptionRecord, Integer> IDENTITY_CALENDAR_EXCEPTION = Identities0.IDENTITY_CALENDAR_EXCEPTION;
+    public static final Identity<UpdateHistoryRecord, Integer> IDENTITY_UPDATE_HISTORY = Identities0.IDENTITY_UPDATE_HISTORY;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -84,6 +87,11 @@ public class Keys {
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
+    private static class Identities0 extends AbstractKeys {
+        public static Identity<CalendarExceptionRecord, Integer> IDENTITY_CALENDAR_EXCEPTION = createIdentity(CalendarException.CALENDAR_EXCEPTION, CalendarException.CALENDAR_EXCEPTION.ID);
+        public static Identity<UpdateHistoryRecord, Integer> IDENTITY_UPDATE_HISTORY = createIdentity(UpdateHistory.UPDATE_HISTORY, UpdateHistory.UPDATE_HISTORY.ID);
+    }
+
     private static class UniqueKeys0 extends AbstractKeys {
         public static final UniqueKey<AreaRecord> AREA_PKEY = createUniqueKey(Area.AREA, "area_pkey", Area.AREA.ID);
         public static final UniqueKey<CalendarDateRecord> CALENDAR_DATE_PKEY = createUniqueKey(CalendarDate.CALENDAR_DATE, "calendar_date_pkey", CalendarDate.CALENDAR_DATE.ID);
@@ -94,7 +102,7 @@ public class Keys {
         public static final UniqueKey<ScheduleRecord> SCHEDULE_PKEY = createUniqueKey(Schedule.SCHEDULE, "schedule_pkey", Schedule.SCHEDULE.ID);
         public static final UniqueKey<ScheduleUpdateRecord> SCHEDULE_UPDATE_PKEY = createUniqueKey(ScheduleUpdate.SCHEDULE_UPDATE, "schedule_update_pkey", ScheduleUpdate.SCHEDULE_UPDATE.ID);
         public static final UniqueKey<StopRecord> STOP_PKEY = createUniqueKey(Stop.STOP, "stop_pkey", Stop.STOP.ID);
-        public static final UniqueKey<UpdateHistoryRecord> UPDATE_HISTORY_PKEY = createUniqueKey(UpdateHistory.UPDATE_HISTORY, "update_history_pkey", UpdateHistory.UPDATE_HISTORY.TIME);
+        public static final UniqueKey<UpdateHistoryRecord> UPDATE_HISTORY_PKEY = createUniqueKey(UpdateHistory.UPDATE_HISTORY, "update_history_pkey", UpdateHistory.UPDATE_HISTORY.ID);
     }
 
     private static class ForeignKeys0 extends AbstractKeys {

@@ -11,7 +11,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Manages an Static-Update and it's dependencies
+ * Manages an Static-Update and its dependencies
  *
  * @author Oliviero Chiodo
  * @author Matteo Patisso
@@ -21,7 +21,7 @@ public class UpdateManager {
     private final UpdateManagerRepository mapperRepository;
     private final UpdateManagerRepository staticRepository;
     /**
-     * Tables to delete in the Static-Database if something goes wrong with an update and a clean-up has to be done
+     * Tables to delete in the static-database if something goes wrong with an update and a clean-up has to be done
      */
     private static final String[] TABLES_TO_DELETE = {ScheduleContract.TABLE_NAME,
             CalendarDateContract.TABLE_NAME,
@@ -31,7 +31,7 @@ public class UpdateManager {
             StopContract.TABLE_NAME,
             AreaContract.TABLE_NAME};
     /**
-     * Tables to delete in the Mappings-Database if something goes wrong with an update and a clean-up has to be done
+     * Tables to delete in the mappings-database if something goes wrong with an update and a clean-up has to be done
      */
     private static final String[] MAPPING_TABLES_TO_DELETE = { AreaMapperContract.TABLE_NAME,
             CalendarDateMapperContract.TABLE_NAME,
@@ -47,13 +47,13 @@ public class UpdateManager {
     public enum Status {IN_PROGRESS, SUCCESS, FAILED}
 
     /**
-     * Constructs an UpdateManager with all it's dependencies
-     * @param mapperRepository
-     * @param staticRepository
-     * @param updateHistoryRepository
-     * @param updateHistoryLength number of successful updates to keep in Database
-     * @param updateTimeoutThreshold threshold to identify a failed Update markes as {@link UpdateManager.Status#IN_PROGRESS}
-     * @param updateTimestampManager
+     * Constructs an UpdateManager with all its dependencies.
+     * @param mapperRepository used to access mapping database.
+     * @param staticRepository used to access schedule database.
+     * @param updateHistoryRepository used to operate on "update_history" table.
+     * @param updateHistoryLength number of successful updates to keep in database.
+     * @param updateTimeoutThreshold threshold to identify a failed update marked as {@link UpdateManager.Status#IN_PROGRESS}
+     * @param updateTimestampManager to get and set current timestamp
      */
     public UpdateManager(UpdateManagerRepository mapperRepository,
                          UpdateManagerRepository staticRepository,
@@ -71,7 +71,7 @@ public class UpdateManager {
 
     /**
      * Adds a new entry to the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory}-table with the status "{@link Status#IN_PROGRESS}"
-     * @return
+     * @return {@link Timestamp} of the new version of data.
      */
     public Timestamp prepareUpdate() {
         Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -146,12 +146,16 @@ public class UpdateManager {
 
     /**
      * Deletes an entry from the {@link ch.bernmobil.vibe.shared.entity.UpdateHistory} table by a given timestamp
-     * @param timestamp
+     * @param timestamp which will be removed
      */
     public void removeUpdateByTimestamp(Timestamp timestamp) {
         staticRepository.deleteByUpdateTimestamp(UpdateHistoryContract.TABLE_NAME, timestamp, UpdateHistoryContract.TIME);
     }
 
+    /**
+     * Get count of rows in the "update_history" table
+     * @return Number of rows
+     */
     public int getRowCount() {
         return updateHistoryRepository.count();
     }

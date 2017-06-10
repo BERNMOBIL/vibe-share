@@ -23,22 +23,30 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UpdateHistory implements Serializable {
 
-    private static final long serialVersionUID = 1219313952;
+    private static final long serialVersionUID = 893484859;
 
+    private final Integer   id;
     private final Timestamp time;
     private final String    status;
 
     public UpdateHistory(UpdateHistory value) {
+        this.id = value.id;
         this.time = value.time;
         this.status = value.status;
     }
 
     public UpdateHistory(
+        Integer   id,
         Timestamp time,
         String    status
     ) {
+        this.id = id;
         this.time = time;
         this.status = status;
+    }
+
+    public Integer getId() {
+        return this.id;
     }
 
     public Timestamp getTime() {
@@ -53,7 +61,8 @@ public class UpdateHistory implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder("UpdateHistory (");
 
-        sb.append(time);
+        sb.append(id);
+        sb.append(", ").append(time);
         sb.append(", ").append(status);
 
         sb.append(")");

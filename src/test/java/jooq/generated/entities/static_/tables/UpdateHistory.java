@@ -15,6 +15,7 @@ import jooq.generated.entities.static_.Public;
 import jooq.generated.entities.static_.tables.records.UpdateHistoryRecord;
 
 import org.jooq.Field;
+import org.jooq.Identity;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UpdateHistory extends TableImpl<UpdateHistoryRecord> {
 
-    private static final long serialVersionUID = -1614584778;
+    private static final long serialVersionUID = 641797945;
 
     /**
      * The reference instance of <code>public.update_history</code>
@@ -51,9 +52,14 @@ public class UpdateHistory extends TableImpl<UpdateHistoryRecord> {
     }
 
     /**
+     * The column <code>public.update_history.id</code>.
+     */
+    public final TableField<UpdateHistoryRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('update_history_id_seq'::regclass)", org.jooq.impl.SQLDataType.INTEGER)), this, "");
+
+    /**
      * The column <code>public.update_history.time</code>.
      */
-    public final TableField<UpdateHistoryRecord, Timestamp> TIME = createField("time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "");
+    public final TableField<UpdateHistoryRecord, Timestamp> TIME = createField("time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
      * The column <code>public.update_history.status</code>.
@@ -88,6 +94,14 @@ public class UpdateHistory extends TableImpl<UpdateHistoryRecord> {
     @Override
     public Schema getSchema() {
         return Public.PUBLIC;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Identity<UpdateHistoryRecord, Integer> getIdentity() {
+        return Keys.IDENTITY_UPDATE_HISTORY;
     }
 
     /**
