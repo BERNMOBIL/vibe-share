@@ -1,6 +1,7 @@
 package ch.bernmobil.vibe.shared;
 
 import ch.bernmobil.vibe.shared.UpdateManager.Status;
+import ch.bernmobil.vibe.shared.entity.UpdateHistory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +32,7 @@ public class UpdateHistoryRepositoryTest {
     }
 
     @Test
-    public void findUpdateHistoryEntryByTimestampTest() {
+    public void findUpdateHistoryByTimestampTest() {
         final Timestamp timestamp = Timestamp.valueOf("2017-06-02 15:48:05");
         final String[] expectedQueries = {
             "SELECT * FROM UPDATE_HISTORY WHERE TIME = CAST(? AS TIMESTAMP) LIMIT ?"
@@ -39,8 +40,8 @@ public class UpdateHistoryRepositoryTest {
         final Object[][] expectedBindings = {
             {timestamp, 1}
         };
-        final UpdateHistoryEntry expectedResult = new UpdateHistoryEntry(timestamp, UpdateManager.Status.FAILED);
-        UpdateHistoryEntry actualResult = updateHistoryRepository.findByTimestamp(timestamp);
+        final UpdateHistory expectedResult = new UpdateHistory(timestamp, UpdateManager.Status.FAILED);
+        UpdateHistory actualResult = updateHistoryRepository.findByTimestamp(timestamp);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -49,15 +50,15 @@ public class UpdateHistoryRepositoryTest {
     }
 
     @Test
-    public void findLastSuccessUpdateHistoryEntryTest() {
+    public void findLastSuccessUpdateHistoryTest() {
         final String[] expectedQueries = {
             "SELECT * FROM UPDATE_HISTORY WHERE STATUS = ? ORDER BY TIME DESC LIMIT ?"
         };
         final Object[][] expectedBindings = {
             {Status.SUCCESS.toString(), 1}
         };
-        final UpdateHistoryEntry expectedResult = new UpdateHistoryEntry(Timestamp.valueOf("2017-06-04 15:48:05"), UpdateManager.Status.SUCCESS);
-        UpdateHistoryEntry actualResult = updateHistoryRepository.findLastSuccessUpdate();
+        final UpdateHistory expectedResult = new UpdateHistory(Timestamp.valueOf("2017-06-04 15:48:05"), UpdateManager.Status.SUCCESS);
+        UpdateHistory actualResult = updateHistoryRepository.findLastSuccessUpdate();
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -66,7 +67,7 @@ public class UpdateHistoryRepositoryTest {
     }
 
     @Test
-    public void findLastSuccessUpdateHistoryEntryWithEmptyDatabaseTest() {
+    public void findLastSuccessUpdateHistoryWithEmptyDatabaseTest() {
         final String[] expectedQueries = {
             "SELECT * FROM UPDATE_HISTORY WHERE STATUS = ? ORDER BY TIME DESC LIMIT ?"
         };
@@ -74,7 +75,7 @@ public class UpdateHistoryRepositoryTest {
             {Status.SUCCESS.toString(), 1}
         };
         mockProvider.actLikeUpdateHistoryIsEmpty = true;
-        UpdateHistoryEntry actualResult = updateHistoryRepository.findLastSuccessUpdate();
+        UpdateHistory actualResult = updateHistoryRepository.findLastSuccessUpdate();
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -86,11 +87,11 @@ public class UpdateHistoryRepositoryTest {
         final String[] expectedQueries = {
             "SELECT * FROM UPDATE_HISTORY ORDER BY TIME DESC LIMIT ?"
         };
-        final UpdateHistoryEntry expectedResult = new UpdateHistoryEntry(Timestamp.valueOf("2017-06-04 15:48:05"), UpdateManager.Status.SUCCESS);
+        final UpdateHistory expectedResult = new UpdateHistory(Timestamp.valueOf("2017-06-04 15:48:05"), UpdateManager.Status.SUCCESS);
         final Object[][] expectedBindings = {
             {1}
         };
-        UpdateHistoryEntry actualResult = updateHistoryRepository.findLastUpdate();
+        UpdateHistory actualResult = updateHistoryRepository.findLastUpdate();
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -107,7 +108,7 @@ public class UpdateHistoryRepositoryTest {
             {1}
         };
         mockProvider.actLikeUpdateHistoryIsEmpty = true;
-        UpdateHistoryEntry actualResult = updateHistoryRepository.findLastUpdate();
+        UpdateHistory actualResult = updateHistoryRepository.findLastUpdate();
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -123,12 +124,12 @@ public class UpdateHistoryRepositoryTest {
             {"SUCCESS", 1}
         };
         final int numUpdates = 2;
-        final UpdateHistoryEntry[] expectedResult = {
-                new UpdateHistoryEntry(Timestamp.valueOf("2017-06-04 15:48:05"), UpdateManager.Status.SUCCESS),
-                new UpdateHistoryEntry(Timestamp.valueOf("2017-06-03 15:48:05"), UpdateManager.Status.IN_PROGRESS),
+        final UpdateHistory[] expectedResult = {
+                new UpdateHistory(Timestamp.valueOf("2017-06-04 15:48:05"), UpdateManager.Status.SUCCESS),
+                new UpdateHistory(Timestamp.valueOf("2017-06-03 15:48:05"), UpdateManager.Status.IN_PROGRESS),
         };
 
-        List<UpdateHistoryEntry> actualResult = updateHistoryRepository.findLatestNSuccessfulUpdates(numUpdates);
+        List<UpdateHistory> actualResult = updateHistoryRepository.findLatestNSuccessfulUpdates(numUpdates);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -149,7 +150,7 @@ public class UpdateHistoryRepositoryTest {
         final int numUpdates = 2;
 
         mockProvider.actLikeUpdateHistoryIsEmpty = true;
-        List<UpdateHistoryEntry> actualResult = updateHistoryRepository.findLatestNSuccessfulUpdates(numUpdates);
+        List<UpdateHistory> actualResult = updateHistoryRepository.findLatestNSuccessfulUpdates(numUpdates);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -165,9 +166,9 @@ public class UpdateHistoryRepositoryTest {
         final Object[][] expectedBindings = {
             {timestamp, Status.SUCCESS.toString()}
         };
-        final UpdateHistoryEntry updateHistoryEntry = new UpdateHistoryEntry(timestamp, UpdateManager.Status.SUCCESS);
+        final UpdateHistory UpdateHistory = new UpdateHistory(timestamp, UpdateManager.Status.SUCCESS);
 
-        updateHistoryRepository.insert(updateHistoryEntry);
+        updateHistoryRepository.insert(UpdateHistory);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
@@ -175,7 +176,7 @@ public class UpdateHistoryRepositoryTest {
     @Test
     public void insertValidInProgressUpdateHistoryTest() {
         final Timestamp timestamp = Timestamp.valueOf("2017-06-04 15:48:05");
-        final UpdateHistoryEntry updateHistoryEntry = new UpdateHistoryEntry(timestamp, UpdateManager.Status.IN_PROGRESS);
+        final UpdateHistory UpdateHistory = new UpdateHistory(timestamp, UpdateManager.Status.IN_PROGRESS);
         final String[] expectedQueries = {
             "INSERT INTO UPDATE_HISTORY (TIME, STATUS) VALUES (CAST(? AS TIMESTAMP), ?)"
         };
@@ -183,16 +184,16 @@ public class UpdateHistoryRepositoryTest {
             {timestamp, Status.SUCCESS.toString()}
         };
 
-        updateHistoryRepository.insert(updateHistoryEntry);
+        updateHistoryRepository.insert(UpdateHistory);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);
     }
 
     @Test
-    public void updateHistoryEntryTest() {
+    public void UpdateHistoryTest() {
         Timestamp timestamp = Timestamp.valueOf("2017-06-04 15:48:05");
-        final UpdateHistoryEntry updateHistoryEntry = new UpdateHistoryEntry(timestamp, UpdateManager.Status.IN_PROGRESS);
+        final UpdateHistory UpdateHistory = new UpdateHistory(timestamp, UpdateManager.Status.IN_PROGRESS);
         final String[] expectedQueries = {
             "UPDATE UPDATE_HISTORY SET STATUS = ? WHERE TIME = CAST(? AS TIMESTAMP)"
         };
@@ -200,7 +201,7 @@ public class UpdateHistoryRepositoryTest {
             {Status.IN_PROGRESS.toString(), timestamp}
         };
 
-        updateHistoryRepository.update(updateHistoryEntry);
+        updateHistoryRepository.update(UpdateHistory);
 
         testHelper.assertQueries(expectedQueries);
         testHelper.assertBindings(expectedBindings);

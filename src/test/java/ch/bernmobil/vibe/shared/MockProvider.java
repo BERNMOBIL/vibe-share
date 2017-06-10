@@ -116,7 +116,7 @@ public class MockProvider implements MockDataProvider {
                 for(UpdateHistory mockUpdateHistory : mockedUpdateHistoryEntries) {
                     UpdateHistoryRecord record = create.newRecord(UPDATE_HISTORY);
                     record.setValue(UPDATE_HISTORY.TIME, mockUpdateHistory.getTime());
-                    record.setValue(UPDATE_HISTORY.STATUS, mockUpdateHistory.getStatus());
+                    record.setValue(UPDATE_HISTORY.STATUS, mockUpdateHistory.getStatus().toString());
                     result.add(record);
                 }
                 mock[0] = new MockResult(mockedUpdateHistoryEntries.size(), result);

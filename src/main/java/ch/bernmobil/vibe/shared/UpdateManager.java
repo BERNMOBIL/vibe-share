@@ -1,6 +1,7 @@
 package ch.bernmobil.vibe.shared;
 
 import ch.bernmobil.vibe.shared.contract.*;
+import ch.bernmobil.vibe.shared.entity.UpdateHistory;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -74,7 +75,7 @@ public class UpdateManager {
      */
     public Timestamp prepareUpdate() {
         Timestamp now = new Timestamp(System.currentTimeMillis());
-        UpdateHistoryEntry newEntry = new UpdateHistoryEntry(now, Status.IN_PROGRESS);
+        UpdateHistory newEntry = new UpdateHistory(now, Status.IN_PROGRESS);
         updateHistoryRepository.insert(newEntry);
         return now;
     }
@@ -93,8 +94,8 @@ public class UpdateManager {
      * <p>Notice: This can be used after a successful update to clean up old data</p>
      */
     public void cleanOldData() {
-        List<UpdateHistoryEntry> latestUpdates = updateHistoryRepository.findLatestNSuccessfulUpdates(updateHistoryLength);
-        List<Timestamp> latestUpdatesTimestamps = latestUpdates.stream().map(UpdateHistoryEntry::getTime).collect(toList());
+        List<UpdateHistory> latestUpdates = updateHistoryRepository.findLatestNSuccessfulUpdates(updateHistoryLength);
+        List<Timestamp> latestUpdatesTimestamps = latestUpdates.stream().map(UpdateHistory::getTime).collect(toList());
         staticRepository.truncate(ScheduleUpdateContract.TABLE_NAME);
         staticRepository.deleteUpdatesWithInvalidTimestamp(TABLES_TO_DELETE, latestUpdatesTimestamps);
         mapperRepository.deleteUpdatesWithInvalidTimestamp(MAPPING_TABLES_TO_DELETE, latestUpdatesTimestamps);
@@ -117,7 +118,7 @@ public class UpdateManager {
      * @return true if collision
      */
     public boolean hasUpdateCollision() {
-        UpdateHistoryEntry lastUpdate = updateHistoryRepository.findLastUpdate();
+        UpdateHistory lastUpdate = updateHistoryRepository.findLastUpdate();
         if(lastUpdate != null && lastUpdate.getStatus().equals(Status.IN_PROGRESS)) {
             Timestamp now = new Timestamp(System.currentTimeMillis());
             long timeDiff = now.getTime() - lastUpdate.getTime().getTime();
@@ -138,7 +139,7 @@ public class UpdateManager {
      * @param status to be set
      */
     public void setStatus(Status status) {
-        UpdateHistoryEntry element = updateHistoryRepository.findByTimestamp(updateTimestampManager.getActiveUpdateTimestamp());
+        UpdateHistory element = updateHistoryRepository.findByTimestamp(updateTimestampManager.getActiveUpdateTimestamp());
         element.setStatus(status);
         updateHistoryRepository.update(element);
     }

@@ -1,5 +1,6 @@
 package ch.bernmobil.vibe.shared.mockdata;
 
+import ch.bernmobil.vibe.shared.UpdateManager.Status;
 import ch.bernmobil.vibe.shared.entity.UpdateHistory;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -16,10 +17,10 @@ public class UpdateHistoryMockData {
             Timestamp.valueOf("2017-06-04 15:48:05"),
     };
 
-    private static String[] status = {
-        "FAILED",
-        "IN_PROGRESS",
-        "SUCCESS",
+    private static Status[] status = {
+        Status.FAILED,
+        Status.IN_PROGRESS,
+        Status.SUCCESS,
     };
 
     public static List<UpdateHistory> getDataSource() {
@@ -36,14 +37,14 @@ public class UpdateHistoryMockData {
     public static List<UpdateHistory> getDataSourceWithValidUpdateCollision() {
         dataSourceWithValidUpdateCollision = new ArrayList<>(getDataSource());
         Timestamp collision = new Timestamp(System.currentTimeMillis() - 2 * 60 * 1000);
-        dataSourceWithValidUpdateCollision.add(new UpdateHistory(collision, "IN_PROGRESS"));
+        dataSourceWithValidUpdateCollision.add(new UpdateHistory(collision, Status.IN_PROGRESS));
         return dataSourceWithValidUpdateCollision;
     }
 
     public static List<UpdateHistory> getDataSourceWithInvalidUpdateCollision() {
         dataSourceWithInvalidUpdateCollision = new ArrayList<>(getDataSource());
         Timestamp invalidCollision = new Timestamp(System.currentTimeMillis() - 5 * 60 * 60 * 1000);
-        dataSourceWithInvalidUpdateCollision.add(new UpdateHistory(invalidCollision, "IN_PROGRESS"));
+        dataSourceWithInvalidUpdateCollision.add(new UpdateHistory(invalidCollision, Status.IN_PROGRESS));
         return dataSourceWithInvalidUpdateCollision;
     }
 }
