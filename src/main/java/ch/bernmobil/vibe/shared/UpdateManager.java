@@ -24,8 +24,8 @@ public class UpdateManager {
      * Tables to delete in the static-database if something goes wrong with an update and a clean-up has to be done
      */
     private static final String[] TABLES_TO_DELETE = {ScheduleContract.TABLE_NAME,
-            CalendarDateContract.TABLE_NAME,
             CalendarExceptionContract.TABLE_NAME,
+            CalendarDateContract.TABLE_NAME,
             JourneyContract.TABLE_NAME,
             RouteContract.TABLE_NAME,
             StopContract.TABLE_NAME,
