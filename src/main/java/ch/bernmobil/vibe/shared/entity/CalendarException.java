@@ -6,10 +6,10 @@ import java.util.UUID;
 public class CalendarException {
   private UUID id;
   private Date date;
-  private String type;
+  private int type;
   private UUID calendarDate;
 
-  public CalendarException(UUID id, Date date, String type, UUID calendarDate) {
+  public CalendarException(UUID id, Date date, int type, UUID calendarDate) {
     this.id = id;
     this.date = date;
     this.type = type;
@@ -32,11 +32,11 @@ public class CalendarException {
     this.date = date;
   }
 
-  public String getType() {
+  public int getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(int type) {
     this.type = type;
   }
 
