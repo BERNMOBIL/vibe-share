@@ -3,19 +3,19 @@ package ch.bernmobil.vibe.shared.mapping;
 import java.util.UUID;
 
 public class CalendarDateMapping {
-    private long gtfsId;
+    private String gtfsId;
     private UUID id;
 
-    public CalendarDateMapping(long gtfsId, UUID id) {
+    public CalendarDateMapping(String gtfsId, UUID id) {
         this.gtfsId = gtfsId;
         this.id = id;
     }
 
-    public long getGtfsId() {
+    public String getGtfsId() {
         return gtfsId;
     }
 
-    public void setGtfsId(long gtfsId) {
+    public void setGtfsId(String gtfsId) {
         this.gtfsId = gtfsId;
     }
 
