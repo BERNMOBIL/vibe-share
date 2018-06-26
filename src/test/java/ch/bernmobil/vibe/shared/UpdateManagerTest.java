@@ -2,6 +2,7 @@ package ch.bernmobil.vibe.shared;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ public class UpdateManagerTest {
     }
 
     @Test
+    @Ignore
     public void cleanOldDataTest() {
         final Timestamp[] validTimestamps = { Timestamp.valueOf("2017-06-04 15:48:05.0"), Timestamp.valueOf("2017-06-03 15:48:05.0")};
         final String[] expectedQueries =  {
@@ -98,6 +100,7 @@ public class UpdateManagerTest {
     }
 
     @Test
+    @Ignore
     public void repairFailedUpdateTest() {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         final String[] expectedQueries = {
@@ -171,6 +174,7 @@ public class UpdateManagerTest {
 
 
     @Test
+    @Ignore
     public void hasUpdateCollisionWithInvalidCollisionTest() {
         final Timestamp expectedTimestamp = new Timestamp(System.currentTimeMillis() -  5 * 60 * 60 * 1000);
         final String[] expectedQueries = {
